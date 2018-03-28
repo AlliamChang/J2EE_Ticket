@@ -8,6 +8,46 @@
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </head>
+
+<script>
+    var areaNum = 1,
+        areaMax = 5;
+
+    function removeArea() {
+        if (areaNum > 1) {
+             var now = '#area' + areaNum;
+            $("[id$="+areaNum+"]").remove();
+            areaNum--;
+        }
+    }
+
+    function addArea() {
+        if (areaNum < areaMax) {
+            areaNum++;
+            var newArea = '<h3 id="title'+areaNum+'">Seat Area '+areaNum+'</h3>' +
+                '<div id="area-group'+areaNum+'" class="form-group">' +
+                '<label for="length'+areaNum+'" class="col-sm-1 control-label">Length</label>' +
+                '<div class="col-sm-3">' +
+                '<input type="number" class="form-control" id="length'+areaNum+'" name="area['+(areaNum-1)+'].length"/>' +
+                '</div>' +
+                '<label for="width'+areaNum+'" class="col-sm-1 control-label">Width</label>' +
+                '<div class="col-sm-3">' +
+                '<input type="number" class="form-control" id="width'+areaNum+'" name="area['+(areaNum-1)+'].width"/>' +
+                '</div>' +
+                '<label for="align'+areaNum+'" class="col-sm-1 control-label">Align</label>' +
+                '<div class="col-sm-3">' +
+                '<select class="form-control" id="align'+areaNum+'" name="area['+(areaNum-1)+'].align">' +
+                '<option>right</option>' +
+                '<option>left</option>' +
+                '<option>center</option>' +
+                '</select>' +
+                '</div>' +
+                '</div>';
+            $(".btn-group").before(newArea);
+        }
+
+    }
+</script>
 <body>
 <div class="container">
     <div class="row clearfix">
@@ -15,17 +55,49 @@
             <form role="form" action="/login/venue_register" method="post">
                 <input type="hidden" name="_method" value="put">
                 <div class="form-group">
-                    <label for="exampleInputEmail1">Email Address</label><input type="email" class="form-control" id="exampleInputEmail1" name="email" required/>
+                    <label for="exampleInputEmail">Email Address</label><input type="email" class="form-control"
+                                                                                id="exampleInputEmail" name="email"
+                                                                                required/>
                 </div>
                 <div class="form-group">
-                    <label for="exampleInputPassword1">Password</label><input type="password" class="form-control" id="exampleInputPassword1" name="password" required/>
+                    <label for="exampleInputPassword">Password</label><input type="password" class="form-control"
+                                                                              id="exampleInputPassword" name="password"
+                                                                              required/>
                 </div>
                 <div class="form-group">
-                    <label for="venue_name">Venue Name</label><input type="text" class="form-control" id="venue_name" name="venueName" required/>
+                    <label for="venue_name">Venue Name</label><input type="text" class="form-control" id="venue_name"
+                                                                     name="venueName" required/>
                 </div>
                 <div class="form-group">
-                    <label for="location">Location</label><input type="text" class="form-control" id="location" name="location" required/>
+                    <label for="location">Location</label><input type="text" class="form-control" id="location"
+                                                                 name="location" required/>
                 </div>
+
+                <h3 id="title1">Seat Area 1</h3>
+                <div id="area-group1" class="form-group">
+                    <label for="length1" class="col-sm-1 control-label">Length</label>
+                    <div class="col-sm-3">
+                        <input type="number" class="form-control" id="length1" name="area[0].length"/>
+                    </div>
+                    <label for="width1" class="col-sm-1 control-label">Width</label>
+                    <div class="col-sm-3">
+                        <input type="number" class="form-control" id="width1" name="area[0].width"/>
+                    </div>
+                    <label for="align1" class="col-sm-1 control-label">Align</label>
+                    <div class="col-sm-3">
+                        <select class="form-control" id="align1" name="area[0].align">
+                            <option>right</option>
+                            <option>left</option>
+                            <option>center</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="btn-group" style="margin: 10px">
+                    <button onclick="addArea()" type="button" class="btn btn-primary">Add</button>
+                    <button onclick="removeArea()" type="button" class="btn btn-default">Remove</button>
+                    <button type="submit" class="btn btn-info" formaction="/seat-preview" formtarget="_blank" formmethod="post">Preview</button>
+                </div>
+                <br>
                 <button type="submit" class="btn btn-default">Register</button>
 
             </form>

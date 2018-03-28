@@ -2,12 +2,14 @@ package cn.avenchang.service.impl;
 
 import cn.avenchang.config.DefaultConfig;
 import cn.avenchang.dao.ManagerDao;
+import cn.avenchang.dao.SeatDao;
 import cn.avenchang.dao.UserDao;
 import cn.avenchang.dao.VenueDao;
 import cn.avenchang.domain.Manager;
 import cn.avenchang.domain.User;
 import cn.avenchang.domain.Venue;
 import cn.avenchang.model.ValidInfo;
+import cn.avenchang.model.VenueInfo;
 import cn.avenchang.service.EmailService;
 import cn.avenchang.service.LoginService;
 import cn.avenchang.model.ResultMessage;
@@ -36,6 +38,8 @@ public class LoginServiceImpl implements LoginService {
     private ManagerDao managerDao;
     @Autowired
     private VenueDao venueDao;
+    @Autowired
+    private SeatDao seatDao;
     @Autowired
     private EmailService emailService;
     @Autowired
@@ -188,20 +192,22 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public ResultMessage<String> venueRegister(final String email, final String password, final String venueName, final String location) {
-        String token = MD5.encrypt(email + password + new Date().toString());
-        String passwdEncrypt = MD5.encrypt(password);
+    public ResultMessage<String> venueRegister(VenueInfo venueInfo) {
+        String token = MD5.encrypt(venueInfo.getEmail() + venueInfo.getPassword() + new Date().toString());
+        String passwdEncrypt = MD5.encrypt(venueInfo.getPassword());
         Venue newVenue = new Venue();
-        newVenue.setEmail(email);
+        newVenue.setEmail(venueInfo.getEmail());
         newVenue.setPassword(passwdEncrypt);
-        newVenue.setName(venueName);
-        newVenue.setLocation(location);
+        newVenue.setName(venueInfo.getVenueName());
+        newVenue.setLocation(venueInfo.getLocation());
         venueDao.register(newVenue);
         if ( newVenue.getId() > 0) {
-//            System.out.println("Success");
+            System.out.println(venueInfo.getArea().size());
+//            venueInfo.getArea().get(0).setVenueId(newVenue.getId());
+            int result = seatDao.insertSeats(newVenue.getId(), venueInfo.getArea());
             final String content = "您已注册成功，现等待网站管理员进行审核，审核过后就会通知您";
             new Thread(
-                    () -> emailService.sendEmail(email, "场馆信息注册成功！", content)
+                    () -> emailService.sendEmail(venueInfo.getEmail(), "场馆信息注册成功！", content)
             ).start();
             return new ResultMessage<>(ResultMessage.OK, "注册成功，提示邮件已发到您的邮箱", "");
 

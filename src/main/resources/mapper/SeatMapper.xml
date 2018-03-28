@@ -1,0 +1,12 @@
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">-->
+<!--<mapper namespace="cn.avenchang.dao.SeatDao">-->
+    <!--&lt;!&ndash; 批量操作和foreach标签 &ndash;&gt;-->
+
+    <!--<insert id="insertSeats" parameterType="java.util.List">-->
+        <!--insert into seat values-->
+        <!--<foreach collection="users" item="users" separator=",">-->
+            <!--(null,#{users.username},#{users.password},#{users.account})-->
+        <!--</foreach>-->
+    <!--</insert>-->
+<!--</mapper>-->

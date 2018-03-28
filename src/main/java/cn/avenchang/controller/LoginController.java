@@ -3,6 +3,7 @@ package cn.avenchang.controller;
 import cn.avenchang.config.Constant;
 import cn.avenchang.model.ResultMessage;
 import cn.avenchang.model.ValidInfo;
+import cn.avenchang.model.VenueInfo;
 import cn.avenchang.service.LoginService;
 import cn.avenchang.state.Role;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,15 +45,9 @@ public class LoginController {
 
     @RequestMapping(value = "/venue_register", method = RequestMethod.PUT)
     public String venueRegister(ModelMap map,
-                                @RequestParam(value = "email") String email,
-                                @RequestParam(value = "password") String password,
-                                @RequestParam(value = "venueName") String venueName,
-                                @RequestParam(value = "location") String location){
+                                VenueInfo venueInfo){
         final ResultMessage<String> resultMessage = loginService.venueRegister(
-                email,
-                password,
-                venueName,
-                location
+                venueInfo
         );
         map.addAttribute("result", resultMessage.result);
         map.addAttribute("status", resultMessage.status);

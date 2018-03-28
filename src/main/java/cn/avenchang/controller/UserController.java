@@ -31,7 +31,7 @@ public class UserController {
 
     @RequestMapping(value = "/plan_list", method = RequestMethod.GET)
     public ModelAndView planList() {
-        ModelAndView view = new ModelAndView("/user/plan_list");
+        ModelAndView view = new ModelAndView("user/plan_list");
         view.addObject("plans", planService.getAllPlans());
         return view;
     }

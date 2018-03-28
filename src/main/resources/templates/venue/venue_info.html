@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EasyTicket</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<script>
+
+    $(document).ready(function () {
+        $("#btn-adaptable").click(function () {
+            $("[id^='adaptable']").hide();
+            $("[id^='target']").show();
+            $("#btn-cancel").show();
+
+            $("#btn-adaptable").attr("class", "btn btn-primary");
+            $("#btn-adaptable").text("保存修改");
+            $("#btn-adaptable").attr({
+                "id": "btn-save",
+                "onclick": "save()"
+            })
+        });
+
+//        $("[id='btn-save']").click(function () {
+//            $("[id^='adaptable']").show();
+//            $("[id^='target']").hide();
+//            $("#btn-cancel").hide();
+//
+//            $("#btn-save").attr("class", "btn btn-default");
+//            $("#btn-save").text("修改资料");
+//            $("#btn-save").attr("id", "btn-adaptable")
+//        });
+
+        $("#btn-cancel").click(function () {
+            $("[id^='adaptable']").show();
+            $("[id^='target']").hide();
+            $("#btn-cancel").hide();
+
+            $("#btn-save").attr("class", "btn btn-default");
+            $("#btn-save").removeAttr("onclick");
+            $("#btn-save").text("修改资料");
+            $("#btn-save").attr("id", "btn-adaptable")
+        })
+    });
+
+    function save() {
+        var id = $("#id").text();
+        var name = $("#name").val();
+        var location = $("#location").val();
+        $.ajax({
+            type: 'put',
+            url: "/venue/venue_info",
+            data: {
+                id: id,
+                name: name,
+                location: location
+            },
+            success: function (data) {
+                if (data.status == 1) {
+                    var hint = ' <div class="alert alert-success alert-dismissable">' +
+                        '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>' +
+                        '<strong>修改申请已提交，请留意您的邮箱！</strong>' +
+                        '</div>';
+                    $("#top").before(hint);
+                } else {
+                    console.log(data.message);
+                    var hint = ' <div class="alert alert-danger alert-dismissable">' +
+                        '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>' +
+                        '<strong>请重试！</strong><span>' + data.message + '</span>' +
+                        '</div>';
+                    $("#id").before(hint);
+                }
+
+                $("[id^='adaptable']").show();
+                $("[id^='target']").hide();
+                $("#btn-cancel").hide();
+
+                $("#btn-save").attr("class", "btn btn-default");
+                $("#btn-save").removeAttr("onclick");
+                $("#btn-save").text("修改资料");
+                $("#btn-save").attr("id", "btn-adaptable")
+            }
+        });
+    }
+</script>
+<body>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-10 column">
+            <h3 class="text-left">
+                EasyTicket
+            </h3>
+        </div>
+        <div class="col-md-2 column" style="margin-top: 10px">
+            <form action="/login/logout" method="post">
+                <button type="submit" class="btn btn-default">Logout</button>
+            </form>
+        </div>
+    </div>
+    <div class="row clearfix">
+        <div class="col-md-2 column">
+            <ul class="nav nav-stacked nav-pills">
+                <li>
+                    <a href="/venue">场馆计划</a>
+                </li>
+                <li class="active">
+                    <a href="/venue/venue_info">场馆信息</a>
+                </li>
+                <li>
+                    <a href="/venue/venue_statistic">场馆统计</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-10 column">
+            <div th:if="${msg != null && msg != ''}" class="alert alert-danger alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <strong>请重试！</strong><span th:text="${msg}"></span>
+            </div>
+            <dl id="top" class="dl-horizontal">
+                <dt>
+                    Venue ID
+                </dt>
+                <dd id="id" th:text="${venue.id}">
+
+                </dd>
+                <dt>
+                    Email Address
+                </dt>
+                <dd id="email" th:text="${venue.email}">
+
+                </dd>
+                <dt>
+                    Venue Name
+                </dt>
+                <dd id="adaptable1" th:text="${venue.name}">
+
+                </dd>
+                <dd id="target1" style="display: none;">
+                    <input id="name" th:value="${venue.name}">
+                </dd>
+                <dt>
+                    Location
+                </dt>
+                <dd id="adaptable2" th:text="${venue.location}">
+
+                </dd>
+                <dd id="target2" style="display: none;">
+                    <input id="location" th:value="${venue.location}">
+                </dd>
+                <dt>
+                    Account
+                </dt>
+                <dd th:text="'¥'+${venue.account}">
+
+                </dd>
+                <dt>
+                    Register Time
+                </dt>
+                <dd th:text="${#dates.format(venue.registTime, 'yyyy-MM-dd HH:mm:ss')}">
+
+                </dd>
+            </dl>
+            <div class="btn-group">
+                <button id="btn-adaptable" type="button" class="btn btn-default">修改资料</button>
+                <button id="btn-cancel" type="button" style="margin-left: 5px; display: none;" class="btn btn-default">
+                    退出修改
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

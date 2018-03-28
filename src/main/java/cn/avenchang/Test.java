@@ -1,5 +1,6 @@
 package cn.avenchang;
 
+import java.text.MessageFormat;
 import java.util.Date;
 
 /**
@@ -8,6 +9,7 @@ import java.util.Date;
 public class Test {
 
     public static void main(String[] args){
-        System.out.println(new Date().toString());
+        MessageFormat mf = new MessageFormat("(#'{'seats[{0}].venueId}, #'{'seats[{0}].area}, #'{'seats[{0}].length}, )");
+//        System.out.println(mf.format());
     }
 }

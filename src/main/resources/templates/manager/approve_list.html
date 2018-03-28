@@ -37,7 +37,130 @@
             </ul>
         </div>
         <div class="col-md-10 column">
+            <div th:if="${msg != null && msg != ''}" class="alert alert-danger alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <strong>请重试！</strong><span th:text="${msg}"></span>
+            </div>
+            <div th:if="${status == 1}" class="alert alert-success alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <strong>审批成功！</strong>
+            </div>
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a data-toggle="tab" href="#register">审批注册</a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#update">审批修改</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="register" class="tab-pane active">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>
+                                编号
+                            </th>
+                            <th>
+                                场馆名
+                            </th>
+                            <th>
+                                地点
+                            </th>
+                            <th>
+                                注册时间
+                            </th>
+                            <th>
+                                座位
+                            </th>
+                            <th>
 
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="venue, iterStat: ${registerVenues}" class="info">
+                            <td th:text="${venue.id}">
+
+                            </td>
+                            <td th:text="${venue.name}">
+
+                            </td>
+                            <td th:text="${venue.location}">
+
+                            </td>
+                            <td th:text="${#dates.format(venue.registTime, 'yyyy-MM-dd HH:mm:ss')}">
+
+                            </td>
+                            <td>
+                                <a target="_blank" th:href="@{/manager/seat_map/{venueId}(venueId=${venue.id})}" class="btn">查看座位表</a>
+                            </td>
+                            <td>
+                                <form method="post" action="/manager/approve_register">
+                                    <input type="hidden" name="_method" value="put">
+                                    <input type="hidden" name="venueId" th:value="${venue.id}">
+                                    <button type="submit" class="btn btn-primary">通过</button>
+                                </form>
+                                <form method="post" action="/manager/refuse_register">
+                                    <input type="hidden" name="_method" value="put">
+                                    <input type="hidden" name="venueId" th:value="${venue.id}">
+                                    <button type="submit" class="btn btn-warning">驳回</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="update" class="tab-pane">
+
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>
+                                编号
+                            </th>
+                            <th>
+                                场馆名
+                            </th>
+                            <th>
+                                新场馆名
+                            </th>
+                            <th>
+                                地点
+                            </th>
+                            <th>
+                                新地点
+                            </th>
+                            <th>
+
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="venue, iterStat: ${updateVenues}" class="info">
+                            <td th:text="${venue.venueId}"></td>
+                            <td th:text="${venue.oldName}"></td>
+                            <td th:text="${venue.newName}"></td>
+                            <td th:text="${venue.oldLocation}"></td>
+                            <td th:text="${venue.newLocation}"></td>
+                            <td>
+                                <form method="post" action="/manager/approve_update">
+                                    <input type="hidden" name="_method" value="put">
+                                    <input type="hidden" name="venueId" th:value="${venue.venueId}">
+                                    <button type="submit" class="btn btn-primary">通过</button>
+                                </form>
+                                <form method="post" action="/manager/refuse_update">
+                                    <input type="hidden" name="_method" value="put">
+                                    <input type="hidden" name="venueId" th:value="${venue.venueId}">
+                                    <button type="submit" class="btn btn-warning">驳回</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>

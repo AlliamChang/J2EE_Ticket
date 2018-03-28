@@ -3,14 +3,15 @@ USE easyticket;
 # DROP TABLE IF EXISTS user;
 # DROP TABLE IF EXISTS account;
 # DROP TABLE IF EXISTS earning;
-# DROP TABLE IF EXISTS manager;
+# # DROP TABLE IF EXISTS manager;
+# DROP TABLE IF EXISTS orders;
 # DROP TABLE IF EXISTS plan;
 # DROP TABLE IF EXISTS plan_price;
 # DROP TABLE IF EXISTS seat;
-# DROP TABLE IF EXISTS seat_state;
-DROP TABLE IF EXISTS venue;
-DROP TABLE IF EXISTS venue_to_approve;
 # DROP TABLE IF EXISTS ticket;
+# DROP TABLE IF EXISTS seat_state;
+# DROP TABLE IF EXISTS venue;
+# DROP TABLE IF EXISTS venue_to_approve;
 
 /*用户*/
 CREATE TABLE user (
@@ -33,15 +34,15 @@ CREATE TABLE user (
 
 /*场馆*/
 CREATE TABLE venue (
-  id           INT(7)        NOT NULL AUTO_INCREMENT,
-  email        VARCHAR(100)  NOT NULL, #用于联系的邮箱，不能用于登录
-  password     VARCHAR(255)  NOT NULL,
-  token        VARCHAR(255)  NOT NULL,
-  flag         INT(2)        NOT NULL DEFAULT 0,
-  name         VARCHAR(100)  NOT NULL,
-  regist_time  DATETIME      NOT NULL, #注册时间
-  location     VARCHAR(255)  NOT NULL,
-  account      DOUBLE(10, 2) NOT NULL DEFAULT 0, #记录在该网赚到的钱
+  id          INT(7)        NOT NULL AUTO_INCREMENT,
+  email       VARCHAR(100)  NOT NULL, #用于联系的邮箱，不能用于登录
+  password    VARCHAR(255)  NOT NULL,
+  token       VARCHAR(255)  NOT NULL,
+  flag        INT(2)        NOT NULL DEFAULT 0,
+  name        VARCHAR(100)  NOT NULL,
+  regist_time DATETIME      NOT NULL, #注册时间
+  location    VARCHAR(255)  NOT NULL,
+  account     DOUBLE(10, 2) NOT NULL DEFAULT 0, #记录在该网赚到的钱
   PRIMARY KEY (id)
 )
   ENGINE = InnoDB
@@ -49,21 +50,22 @@ CREATE TABLE venue (
 
 /*待审核的场馆信息*/
 CREATE TABLE venue_to_approve (
-  id           INT(7)        NOT NULL,
-  email        VARCHAR(100)  NOT NULL, #用于联系的邮箱，不能用于登录
-  flag         INT(2)        NOT NULL DEFAULT 0,
-  name         VARCHAR(100)  NOT NULL,
-  location     VARCHAR(255)  NOT NULL,
+  id       INT(7)       NOT NULL,
+  email    VARCHAR(100) NOT NULL, #用于联系的邮箱，不能用于登录
+  flag     INT(2)       NOT NULL DEFAULT 0,
+  name     VARCHAR(100) NOT NULL,
+  location VARCHAR(255) NOT NULL,
   PRIMARY KEY (id)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
 /*在新场馆申请注册后，往待审批的表中同时插入一条相同的信息*/
-CREATE TRIGGER add_venue_to_approve AFTER INSERT ON venue
-  FOR EACH ROW
-  INSERT INTO venue_to_approve(id, email, flag, name, location)
-      VALUE (new.id, new.email, new.flag, new.name, new.location);
+CREATE TRIGGER add_venue_to_approve
+AFTER INSERT ON venue
+FOR EACH ROW
+  INSERT INTO venue_to_approve (id, email, flag, name, location)
+    VALUE (new.id, new.email, new.flag, new.name, new.location);
 
 /*模拟银行账号*/
 CREATE TABLE account (
@@ -77,11 +79,11 @@ CREATE TABLE account (
 
 /*座位区，规定为矩形*/
 CREATE TABLE seat (
-  venue_id  INT(7)     NOT NULL, #所属场馆号
-  area      INT        NOT NULL, #座位区号
-  length    INT        NOT NULL DEFAULT 1, #长
-  width     INT        NOT NULL DEFAULT 1, #宽
-  direction VARCHAR(1) NOT NULL, #座位朝向
+  venue_id INT(7)     NOT NULL, #所属场馆号
+  area     INT        NOT NULL, #座位区号
+  length   INT        NOT NULL DEFAULT 1, #长
+  width    INT        NOT NULL DEFAULT 1, #宽
+  align    VARCHAR(6) NOT NULL, #座位朝向
   PRIMARY KEY (venue_id, area)
 )
   ENGINE = InnoDB
@@ -90,9 +92,9 @@ CREATE TABLE seat (
 /*展演计划*/
 CREATE TABLE plan (
   id           INT          NOT NULL AUTO_INCREMENT,
-  title VARCHAR(100) NOT NULL ,
+  title        VARCHAR(100) NOT NULL,
   venue_id     INT(7)       NOT NULL,
-  venue_name VARCHAR(100) NOT NULL ,
+  venue_name   VARCHAR(100) NOT NULL,
   time         DATETIME     NOT NULL,
   description  VARCHAR(255) NOT NULL,
   type         VARCHAR(20)  NOT NULL,
@@ -105,6 +107,7 @@ CREATE TABLE plan (
 /*展演计划座位价格*/
 CREATE TABLE plan_price (
   plan_id INT          NOT NULL,
+  name    VARCHAR(10)  NOT NULL,
   area    INT          NOT NULL,
   price   DOUBLE(6, 2) NOT NULL DEFAULT 0,
   PRIMARY KEY (plan_id, area)
@@ -124,20 +127,34 @@ CREATE TABLE seat_state (
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-/*购买到的演出票*/
-CREATE TABLE ticket (
+/* 在线上买票的订单 */
+CREATE TABLE orders (
   id             INT          NOT NULL AUTO_INCREMENT,
   user_id        INT          NOT NULL,
-  plan_id        INT          NOT NULL,
   venue_id       INT          NOT NULL,
-  area           INT          NOT NULL,
-  row            INT          NOT NULL,
-  col            INT          NOT NULL,
-  time           DATETIME     NOT NULL, #购买时间
-  state          INT(3)       NOT NULL DEFAULT 0, #票的状态
+  plan_id        INT          NOT NULL,
+  time           DATETIME     NOT NULL, #下单时间
+  state          INT(3)       NOT NULL DEFAULT 0, #订单的状态
   original_price DOUBLE(6, 2) NOT NULL, #原始价格
   actual_price   DOUBLE(6, 2) NOT NULL, #实际价格(会员价)
-  is_online      INT(1)       NOT NULL DEFAULT 1, #是否在网上购票
+  PRIMARY KEY (id)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
+
+/*购买到的演出票*/
+CREATE TABLE ticket (
+  id        INT      NOT NULL AUTO_INCREMENT,
+  order_id  INT      NOT NULL DEFAULT 0, #若为线下购票，则为0
+  user_id   INT      NOT NULL DEFAULT 0, #若为非会员购票，则为0
+  plan_id   INT      NOT NULL,
+  venue_id  INT      NOT NULL,
+  area      INT      NOT NULL,
+  row       INT      NOT NULL,
+  col       INT      NOT NULL,
+  time      DATETIME NOT NULL, #购买时间
+  state     INT(3)   NOT NULL DEFAULT 0, #票的状态
+  is_online INT(1)   NOT NULL DEFAULT 1, #是否在网上购票
   PRIMARY KEY (id)
 )
   ENGINE = InnoDB
@@ -145,7 +162,7 @@ CREATE TABLE ticket (
 
 /*经理账号*/
 CREATE TABLE manager (
-  id INT NOT NULL UNIQUE ,
+  id       INT          NOT NULL UNIQUE,
   username VARCHAR(10)  NOT NULL,
   password VARCHAR(255) NOT NULL,
   token    VARCHAR(255) NOT NULL,

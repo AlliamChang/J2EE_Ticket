@@ -2,6 +2,7 @@ package cn.avenchang.service;
 
 import cn.avenchang.model.ResultMessage;
 import cn.avenchang.model.ValidInfo;
+import cn.avenchang.model.VenueInfo;
 import cn.avenchang.state.Role;
 
 /**
@@ -23,7 +24,7 @@ public interface LoginService {
 
     ResultMessage<String> confirmDelete(Long id, String verification, String token);
 
-    ResultMessage<String> venueRegister(String email, String password, String venueName, String location);
+    ResultMessage<String> venueRegister(VenueInfo venueInfo);
 
     ResultMessage<ValidInfo> venueFirstLogin(Long id, String password);
 

@@ -1,16 +1,21 @@
 package cn.avenchang.controller;
 
 import cn.avenchang.config.Constant;
+import cn.avenchang.model.VenueInfo;
 import cn.avenchang.state.Role;
+import cn.avenchang.util.SeatUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by 53068 on 2018/3/25 0025.
@@ -58,5 +63,12 @@ public class MainController {
         return "forward:/manager/approve_list";
     }
 
+    @RequestMapping(value = "/seat-preview", method = RequestMethod.PUT)
+    public ModelAndView seatPreview(VenueInfo venueInfo) {
+        ModelAndView view = new ModelAndView("seat_preview");
+        Logger.getLogger(getClass().getName()).log(Level.INFO, ""+venueInfo.getArea().size());
+        view.addObject("seatMap", SeatUtil.getSeatMap(venueInfo.getArea()));
+        return view;
+    }
 
 }

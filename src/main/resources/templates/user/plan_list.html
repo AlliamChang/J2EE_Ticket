@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EasyTicket</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-10 column">
+            <h3 class="text-left">
+                EasyTicket
+            </h3>
+        </div>
+        <div class="col-md-2 column" style="margin-top: 10px">
+            <form action="/login/logout" method="post">
+                <button type="submit" class="btn btn-default">Logout</button>
+            </form>
+        </div>
+    </div>
+    <div class="row clearfix">
+        <div class="col-md-2 column">
+            <ul class="nav nav-stacked nav-pills">
+                <li class="active">
+                    <a href="/user">所有计划</a>
+                </li>
+                <li>
+                    <a href="/user/my_order">我的订单</a>
+                </li>
+                <li>
+                    <a href="/user/my_info">我的资料</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-10 column">
+            <div class="row">
+                <div th:each="plan, iterStat: ${plans}" class="col-md-4">
+                    <div class="thumbnail">
+                        <img alt="300x200" th:src="${plan.poster}"/>
+                        <div class="caption">
+                            <h3 th:text="${plan.title}">Title</h3>
+                            <p><span th:text="${plan.type}" class="label label-info">类型</span></p>
+                            <p>场馆: <span th:text="${plan.venueName}"></span> </p>
+                            <p>时间: <span  th:text="${#dates.format(plan.time, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+                            <p>
+                                <a class="btn btn-primary" th:href="@{/user/plan/{planId}(planId=${plan.id})}">查看详情</a>
+                                <a class="btn">¥<span th:text="${plan.lowestPrice}"></span>起</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="col-md-4">-->
+                    <!--<div class="thumbnail">-->
+                        <!--<img alt="300x200" src="/image/sports.jpg"/>-->
+                        <!--<div class="caption">-->
+                            <!--<h3>-->
+                                <!--Thumbnail label-->
+                            <!--</h3>-->
+                            <!--<p>-->
+                                <!--Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta-->
+                                <!--gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.-->
+                            <!--</p>-->
+                            <!--<p>-->
+                                <!--<a class="btn btn-primary" href="#">Action</a> <a class="btn" href="#">Action</a>-->
+                            <!--</p>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            </div>
+            <!--<ul class="pagination">-->
+                <!--<li>-->
+                    <!--<a href="#">Prev</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<a href="#">1</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<a href="#">2</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<a href="#">3</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<a href="#">4</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<a href="#">5</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<a href="#">Next</a>-->
+                <!--</li>-->
+            <!--</ul>-->
+        </div>
+    </div>
+</div>
+</body>
+</html>

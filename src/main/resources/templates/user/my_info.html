@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EasyTicket</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<script>
+    $(document).ready(function () {
+        $("#btn-adaptable").click(function () {
+            $("[id^='adaptable']").hide();
+            $("[id^='target']").show();
+            $("#btn-cancel").show();
+
+            $("#btn-adaptable").attr("class", "btn btn-primary");
+            $("#btn-adaptable").text("保存修改");
+            $("#btn-adaptable").attr({
+                "id": "btn-save",
+                "onclick": "save()"
+            })
+        });
+
+//        $("[id='btn-save']").click(function () {
+//            $("[id^='adaptable']").show();
+//            $("[id^='target']").hide();
+//            $("#btn-cancel").hide();
+//
+//            $("#btn-save").attr("class", "btn btn-default");
+//            $("#btn-save").text("修改资料");
+//            $("#btn-save").attr("id", "btn-adaptable")
+//        });
+
+        $("#btn-cancel").click(function () {
+            $("[id^='adaptable']").show();
+            $("[id^='target']").hide();
+            $("#btn-cancel").hide();
+
+            $("#btn-save").attr("class", "btn btn-default");
+            $("#btn-save").removeAttr("onclick");
+            $("#btn-save").text("修改资料");
+            $("#btn-save").attr("id", "btn-adaptable")
+        })
+    });
+
+    function save() {
+        var email = $("#email").text();
+        var real_name = $("#real_name").val();
+        var username = $("#username").val();
+        console.log(real_name);
+        $.post("/user/my_info", {
+            email: email,
+            realName: real_name,
+            username: username
+        }, function (data, status) {
+            if (status == 'success') {
+                $("#adaptable1").text(real_name);
+                $("#adaptable2").text(username);
+                var hint = ' <div class="alert alert-success alert-dismissable">' +
+                    '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>' +
+                    '<strong>保存成功！</strong>' +
+                    '</div>';
+                $("#delete").before(hint);
+            } else {
+                console.log(data.message);
+                var hint = ' <div class="alert alert-danger alert-dismissable">' +
+                    '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>' +
+                    '<strong>请重试！</strong><span>' + data.message + '</span>' +
+                    '</div>';
+                $("#delete").before(hint);
+            }
+
+            $("[id^='adaptable']").show();
+            $("[id^='target']").hide();
+            $("#btn-cancel").hide();
+
+            $("#btn-save").attr("class", "btn btn-default");
+            $("#btn-save").removeAttr("onclick");
+            $("#btn-save").text("修改资料");
+            $("#btn-save").attr("id", "btn-adaptable")
+        });
+    }
+
+    function confirmDelete() {
+        var result = confirm("确认要注销该账号吗？\n该操作是无法撤销的");
+        if (result == true) {
+            $.ajax(
+                {
+                    type: 'delete',
+                    url: '/login/user',
+                    success: function (data) {
+                        var hint = ' <div class="alert alert-success alert-dismissable">' +
+                            '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>' +
+                            '<strong>请到邮箱中再次确认操作!</strong>' +
+                            '</div>';
+                        $("#delete").before(hint);
+                    }
+                }
+            )
+        }
+    }
+
+</script>
+<style id="each_item">
+
+</style>
+<body>
+
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-10 column">
+            <h3 class="text-left">
+                EasyTicket
+            </h3>
+        </div>
+        <div class="col-md-2 column" style="margin-top: 10px">
+            <form action="/login/logout" method="post">
+                <button type="submit" class="btn btn-default">Logout</button>
+            </form>
+        </div>
+    </div>
+    <div class="row clearfix">
+        <div class="col-md-2 column">
+            <ul class="nav nav-stacked nav-pills">
+                <li>
+                    <a href="/user">所有计划</a>
+                </li>
+                <li>
+                    <a href="/user/my_order">我的订单</a>
+                </li>
+                <li class="active">
+                    <a href="/user/my_info">我的资料</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-10 column">
+            <div th:if="${msg != null && msg != ''}" class="alert alert-danger alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <strong>请重试！</strong><span th:text="${msg}"></span>
+            </div>
+            <button id="delete" type="button" style="position: absolute; right: 40%" class="btn btn-default" onclick="confirmDelete()">注销账号
+            </button>
+            <dl class="dl-horizontal">
+                <dt>
+                    Email Address
+                </dt>
+                <dd id="email" th:text="${user.email}">
+
+                </dd>
+                <dt>
+                    Real Name
+                </dt>
+                <dd id="adaptable1" th:text="${user.realName}">
+
+                </dd>
+                <dd id="target1" style="display: none;">
+                    <input id="real_name" th:value="${user.realName}">
+                </dd>
+                <dt>
+                    Username
+                </dt>
+                <dd id="adaptable2" th:text="${user.username}">
+
+                </dd>
+                <dd id="target2" style="display: none;">
+                    <input id="username" th:value="${user.username}">
+                </dd>
+                <dt>
+                    Points
+                </dt>
+                <dd th:text="${user.restPoints}">
+                    <!--<button type="button" class="btn btn-default">兑换优惠券</button>-->
+                </dd>
+                <dt>
+                    Level
+                </dt>
+                <dd th:text="${user.level}">
+
+                </dd>
+                <dt>
+                    Register Time
+                </dt>
+                <dd th:text="${#dates.format(user.registTime, 'yyyy-MM-dd HH:mm:ss')}">
+
+                </dd>
+            </dl>
+            <div class="btn-group">
+                <button id="btn-adaptable" type="button" class="btn btn-default">修改资料</button>
+                <button id="btn-cancel" type="button" style="margin-left: 5px; display: none;" class="btn btn-default">
+                    退出修改
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

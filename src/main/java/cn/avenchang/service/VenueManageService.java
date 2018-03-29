@@ -1,5 +1,6 @@
 package cn.avenchang.service;
 
+import cn.avenchang.domain.Plan;
 import cn.avenchang.domain.Venue;
 import cn.avenchang.model.ResultMessage;
 
@@ -12,9 +13,12 @@ public interface VenueManageService {
 
     ResultMessage<Venue> getInfo(Long id);
 
-    void releasePlan();
+    ResultMessage<Boolean> releasePlan(Plan plan);
 
-    void updateSeat();
+    ResultMessage<Boolean> checkIn(Long ticketId);
 
+    String getVenueName(Long id);
+
+    void buyTicketOffline();
 
 }

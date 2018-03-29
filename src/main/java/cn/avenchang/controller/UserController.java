@@ -1,9 +1,11 @@
 package cn.avenchang.controller;
 
 import cn.avenchang.config.Constant;
+import cn.avenchang.domain.Plan;
 import cn.avenchang.model.ResultMessage;
 import cn.avenchang.model.UserInfo;
 import cn.avenchang.service.PlanService;
+import cn.avenchang.service.SeatService;
 import cn.avenchang.service.UserManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +30,8 @@ public class UserController {
     private UserManageService userManageService;
     @Autowired
     private PlanService planService;
+    @Autowired
+    private SeatService seatService;
 
     @RequestMapping(value = "/plan_list", method = RequestMethod.GET)
     public ModelAndView planList() {
@@ -39,6 +43,15 @@ public class UserController {
     @RequestMapping(value = "/plan/{id}", method = RequestMethod.GET)
     public ModelAndView planDetail(@PathVariable Long id) {
         ModelAndView view = new ModelAndView("/user/plan_detail");
+        view.addObject( "plan" ,planService.getPlanDetail(id));
+        view.addObject("id", id);
+        return view;
+    }
+
+    @RequestMapping(value = "/choose_seat/{planId}", method = RequestMethod.GET)
+    public ModelAndView chooseSeatPage(@PathVariable Long planId) {
+        ModelAndView view = new ModelAndView("/user/choose_seat");
+        view.addObject("seat", seatService.getLiveSeatMap(planId));
         return view;
     }
 

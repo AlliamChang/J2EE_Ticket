@@ -1,6 +1,7 @@
 package cn.avenchang.service;
 
 import cn.avenchang.domain.Seat;
+import cn.avenchang.model.LiveSeatMap;
 
 import java.util.List;
 
@@ -10,4 +11,6 @@ import java.util.List;
 public interface SeatService {
 
     List<Seat> getSeatMap(Long venueId);
+
+    LiveSeatMap getLiveSeatMap(Long planId);
 }

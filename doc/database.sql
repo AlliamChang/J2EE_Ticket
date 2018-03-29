@@ -6,7 +6,7 @@ USE easyticket;
 # # DROP TABLE IF EXISTS manager;
 # DROP TABLE IF EXISTS orders;
 # DROP TABLE IF EXISTS plan;
-# DROP TABLE IF EXISTS plan_price;
+DROP TABLE IF EXISTS plan_price;
 # DROP TABLE IF EXISTS seat;
 # DROP TABLE IF EXISTS ticket;
 # DROP TABLE IF EXISTS seat_state;
@@ -107,7 +107,7 @@ CREATE TABLE plan (
 /*展演计划座位价格*/
 CREATE TABLE plan_price (
   plan_id INT          NOT NULL,
-  name    VARCHAR(10)  NOT NULL,
+  name    VARCHAR(10)  NOT NULL, #该类价格的名称
   area    INT          NOT NULL,
   price   DOUBLE(6, 2) NOT NULL DEFAULT 0,
   PRIMARY KEY (plan_id, area)
@@ -133,6 +133,7 @@ CREATE TABLE orders (
   user_id        INT          NOT NULL,
   venue_id       INT          NOT NULL,
   plan_id        INT          NOT NULL,
+  account_id     INT          NOT NULL,
   time           DATETIME     NOT NULL, #下单时间
   state          INT(3)       NOT NULL DEFAULT 0, #订单的状态
   original_price DOUBLE(6, 2) NOT NULL, #原始价格

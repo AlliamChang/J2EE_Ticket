@@ -10,9 +10,11 @@ public class PlanInfo {
     private Long id;
     private String title;
     private String venueName;
+    private String venueLocation;
     private String type;
     private Date time;
     private Double lowestPrice;
+    private String description;
     private String poster;
 
     public Long getId() {
@@ -76,5 +78,21 @@ public class PlanInfo {
 
     public String getPoster() {
         return poster;
+    }
+
+    public String getVenueLocation() {
+        return venueLocation;
+    }
+
+    public void setVenueLocation(String venueLocation) {
+        this.venueLocation = venueLocation;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

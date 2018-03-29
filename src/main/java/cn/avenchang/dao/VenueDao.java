@@ -95,4 +95,7 @@ public interface VenueDao {
 
     @Select("SELECT email FROM venue WHERE id = #{id}")
     String findVenueEmail(@Param("id") Long id);
+
+    @Select("SELECT name FROM venue WHERE id = #{id}")
+    String getVenueName(@Param("id") Long id);
 }

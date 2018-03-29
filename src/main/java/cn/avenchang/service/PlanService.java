@@ -1,5 +1,6 @@
 package cn.avenchang.service;
 
+import cn.avenchang.domain.Plan;
 import cn.avenchang.model.PlanInfo;
 
 import java.util.List;
@@ -9,5 +10,9 @@ import java.util.List;
  */
 public interface PlanService {
 
+    PlanInfo getPlanDetail(Long id);
+
     List<PlanInfo> getAllPlans();
+
+    List<PlanInfo> getVenuePlan(Long venueId);
 }

@@ -25,7 +25,7 @@
     <div class="row clearfix">
         <div class="col-md-2 column">
             <ul class="nav nav-stacked nav-pills">
-                <li class="active">
+                <li>
                     <a href="/venue">场馆计划</a>
                 </li>
                 <li>
@@ -34,7 +34,7 @@
                 <li>
                     <a href="/venue/venue_statistic">场馆统计</a>
                 </li>
-                <li>
+                <li class="active">
                     <a href="/venue/check_in">检票登记</a>
                 </li>
             </ul>
@@ -42,30 +42,26 @@
         <div class="col-md-10 column">
             <div th:if="${msg != null && msg != ''}" class="alert alert-danger alert-dismissable">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <strong>发布失败!</strong><span th:text="${msg}"></span>
+                <strong>检票失败!</strong><span th:text="${msg}"></span>
             </div>
             <div th:if="${status == 1}" class="alert alert-success alert-dismissable">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <strong>发布成功!</strong>
+                 <strong>检票成功!</strong>
             </div>
-            <a href="/venue/new_plan" class="btn btn-default btn-primary">发布计划</a>
-            <br>
-            <br>
-            <div class="row">
-                <div th:each="plan, iterStat: ${plans}" class="col-md-4">
-                    <div class="thumbnail">
-                        <img alt="300x200" th:src="${plan.poster}"/>
-                        <div class="caption">
-                            <h3 th:text="${plan.title}">Title</h3>
-                            <p><span th:text="${plan.type}" class="label label-info">类型</span></p>
-                            <p>时间: <span  th:text="${#dates.format(plan.time, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
-                            <p>
-                                <a class="btn btn-primary" th:href="@{/venue/offline_ticket/{planId}(planId=${plan.id})}">线下买票</a>
-                            </p>
-                        </div>
+            <form class="form-horizontal" role="form" action="/venue/check_in" method="post">
+                <input type="hidden" name="_method" value="put">
+                <div class="form-group">
+                    <label for="ticketId" class="col-sm-2 control-label">Ticket ID</label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" id="ticketId" />
                     </div>
                 </div>
-            </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-default">Check in</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

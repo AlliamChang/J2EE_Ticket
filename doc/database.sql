@@ -2,11 +2,11 @@ USE easyticket;
 
 # DROP TABLE IF EXISTS user;
 # DROP TABLE IF EXISTS account;
-# DROP TABLE IF EXISTS earning;
-# # DROP TABLE IF EXISTS manager;
+DROP TABLE IF EXISTS earning;
+# DROP TABLE IF EXISTS manager;
 # DROP TABLE IF EXISTS orders;
 # DROP TABLE IF EXISTS plan;
-DROP TABLE IF EXISTS plan_price;
+# DROP TABLE IF EXISTS plan_price;
 # DROP TABLE IF EXISTS seat;
 # DROP TABLE IF EXISTS ticket;
 # DROP TABLE IF EXISTS seat_state;
@@ -136,6 +136,7 @@ CREATE TABLE orders (
   account_id     INT          NOT NULL,
   time           DATETIME     NOT NULL, #下单时间
   state          INT(3)       NOT NULL DEFAULT 0, #订单的状态
+  ticket_num     INT          NOT NULL DEFAULT 0, #如果订单是选座，则为0；如果是不选座，则为购票数
   original_price DOUBLE(6, 2) NOT NULL, #原始价格
   actual_price   DOUBLE(6, 2) NOT NULL, #实际价格(会员价)
   PRIMARY KEY (id)
@@ -174,11 +175,13 @@ CREATE TABLE manager (
 
 /*场馆累积赚的钱，由经理结算*/
 CREATE TABLE earning (
-  venue_id INT(8)        NOT NULL, #id=10000000代表该网站的盈利
-  earning  DOUBLE(10, 2) NOT NULL DEFAULT 0,
-  PRIMARY KEY (venue_id)
+  venue_id  INT           NOT NULL, #id=10000000代表该网站的盈利
+  plan_id   INT           NOT NULL, #以每场为基础结算, 只结算已经开场(开场即结束)的钱
+  earning   DOUBLE(10, 2) NOT NULL DEFAULT 0,
+  is_settle INT(1)        NOT NULL DEFAULT 0, #是否结算了
+  PRIMARY KEY (venue_id, plan_id)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-# INSERT INTO earning VALUE (10000000, 0);
+INSERT INTO earning VALUE (10000000, 0, 0, 1); #网站的盈利

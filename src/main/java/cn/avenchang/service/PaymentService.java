@@ -3,8 +3,14 @@ package cn.avenchang.service;
 /**
  * Created by 53068 on 2018/3/14 0014.
  */
+
+import cn.avenchang.model.ResultMessage;
+
+/**
+ * 模拟第三方支付
+ */
 public interface PaymentService {
 
-    void pay(String id, String password, Double amount);
+    ResultMessage<Boolean> pay(Long orderId, Long cardId, String password, Double amount);
 
 }

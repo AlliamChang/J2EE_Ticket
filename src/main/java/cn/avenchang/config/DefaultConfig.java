@@ -37,11 +37,12 @@ public class DefaultConfig {
         return userLevel;
     }
 
-    public static List<Double> getUserDiscount() {
+    public List<Double> getUserDiscount() {
         return userDiscount;
     }
 
-    public static Double getWebProfit() {
+    public Double getWebProfit() {
         return webProfit;
     }
+
 }

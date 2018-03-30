@@ -50,16 +50,21 @@ public class SeatUtil {
 
     public static LiveSeatMap getLiveSeatMap(List<Seat> areas, List<PlanPrice> price, List<SeatState> unavailable) {
         LiveSeatMap liveSeatMap = new LiveSeatMap();
-        Map<Integer, Double> areaToPrice = new HashMap<Integer, Double>();
+        Map<Integer, Double> areaToPrice = new HashMap();
+        Map<Integer, String> areaToName = new HashMap<>();
         int maxLength = maxLength(areas);
 
         List<Double> priceLevel = new ArrayList<>();
-        //build seat legend
+        //build seat legend and price
         price.forEach(planPrice -> {
             if(priceLevel.indexOf(planPrice.getPrice()) < 0){
                 liveSeatMap.getSeatLegend().add(new String[]{
                         String.valueOf((char) ('a'+priceLevel.size())),
                         "available",
+                        planPrice.getName()+"(¥"+planPrice.getPrice()+")"
+                });
+                liveSeatMap.getSeatPrice().add(new Object[]{
+                        planPrice.getPrice(),
                         planPrice.getName()
                 });
                 priceLevel.add(planPrice.getPrice());
@@ -95,10 +100,6 @@ public class SeatUtil {
             if(i < areas.size() - 1){
                 liveSeatMap.getSeatMap().add(split);
             }
-        }
-
-        for (int i = 0; i < priceLevel.size(); i++) {
-
         }
 
         //build seat unavailable

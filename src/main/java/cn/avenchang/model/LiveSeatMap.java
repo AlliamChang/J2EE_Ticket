@@ -11,7 +11,7 @@ public class LiveSeatMap {
     private List<String> seatMap = new ArrayList<>();
     private List<String[]> seatLegend = new ArrayList<>();
     private List<String> seatUnavailable = new ArrayList<>();
-    private List<String> seatPrice = new ArrayList<>();
+    private List<Object[]> seatPrice = new ArrayList<>();
 
     public List<String> getSeatMap() {
         return seatMap;
@@ -37,11 +37,11 @@ public class LiveSeatMap {
         this.seatUnavailable = seatUnavailable;
     }
 
-    public List<String> getSeatPrice() {
+    public List<Object[]> getSeatPrice() {
         return seatPrice;
     }
 
-    public void setSeatPrice(List<String> seatPrice) {
+    public void setSeatPrice(List<Object[]> seatPrice) {
         this.seatPrice = seatPrice;
     }
 }

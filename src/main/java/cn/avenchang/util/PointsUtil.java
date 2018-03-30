@@ -26,4 +26,8 @@ public class PointsUtil {
         }
         return level;
     }
+
+    public static double getDiscount(int points) {
+        return defaultConfig.getUserDiscount().get(getLevel(points));
+    }
 }

@@ -31,8 +31,8 @@ public interface SeatDao {
     int insertSeatStates(@Param("planId") Long planId, @Param("seats") List<Seat> seats);
 
     @Update("UPDATE seat_state SET state = 1 " +
-            "WHERE plan_id = #{planId} AND area = #{area} AND row = #{row} AND col = #{col} AND state = 0")
-    int bookSeat(@Param("planId") Long planId, @Param("area") int area, @Param("row") int row, @Param("col") int col);
+            "WHERE plan_id = #{planId} AND row = #{row} AND col = #{col} AND state = 0")
+    int bookSeat(SeatState seatState);
 
     @Select("SELECT * FROM seat_state WHERE plan_id = #{planId} AND state = 1")
     List<SeatState> getUnavailableSeats(@Param("planId") Long planId);
@@ -42,6 +42,9 @@ public interface SeatDao {
 
     @Select("SELECT count(*) FROM seat_state WHERE plan_id = #{planId} AND state = 0")
     int getAllAvailableSeatNum(@Param("planId") Long planId);
+
+    @Select("SELECT count(*) FROM seat_state WHERE plan_id = #{planId} AND row = #{row} AND col = #{col} AND state = 0")
+    int isAvailable(SeatState seatState);
 
     class SeatDaoProvider {
         public static String insertSeat(Map map) {

@@ -21,7 +21,14 @@
 
 
         </div>
-        <div id="legend"></div>
+        <div class="booking-details">
+            <h3>已选座位</h3>
+            总价: <b>¥<span id="total">0</span></b>
+            <div class="booking-details">
+                <button formtarget="_blank" class="btn btn-primary">购买</button>
+                <div id="legend"></div>
+            </div>
+        </div>
         <!--</div>-->
         <!--</div>-->
     </div>
@@ -29,54 +36,88 @@
 </body>
 <script th:inline="javascript">
     /*<![CDATA[*/
+    var selected = 0;
     $(document).ready(function () {
-        sc = $('#seat-map').seatCharts({
-            map: /*[[${seat.seatMap}]]*/,
-            seats: {
-                a: {
-                    price: 100,
-                    classes: 'a-class'
+        var $total = $('#total'),
+            sc = $('#seat-map').seatCharts({
+                map: /*[[${seat.seatMap}]]*/,
+                seats: {
+                    a: {
+                        price: /*[[${(seat.seatPrice.size() < 1)} ? 0 : ${seat.seatPrice.get(0)[0]}]]*/,
+                        classes: 'a-class',
+                        name: /*[[${(seat.seatPrice.size() < 1)} ? '' : ${seat.seatPrice.get(0)[1]}]]*/
+                    },
+                    b: {
+                        price: /*[[${(seat.seatPrice.size() < 2)} ? 0 : ${seat.seatPrice.get(1)[0]}]]*/,
+                        classes: 'b-class',
+                        name: /*[[${(seat.seatPrice.size() < 2)} ? '' : ${seat.seatPrice.get(1)[1]}]]*/
+                    },
+                    c: {
+                        price: /*[[${(seat.seatPrice.size() < 3)} ? 0 : ${seat.seatPrice.get(2)[0]}]]*/,
+                        classes: 'c-class',
+                        name: /*[[${(seat.seatPrice.size() < 3)} ? '' : ${seat.seatPrice.get(2)[1]}]]*/
+                    },
+                    d: {
+                        price: /*[[${(seat.seatPrice.size() < 4)} ? 0 : ${seat.seatPrice.get(3)[0]}]]*/,
+                        classes: 'd-class',
+                        name: /*[[${(seat.seatPrice.size() < 4)} ? '' : ${seat.seatPrice.get(3)[1]}]]*/
+                    },
+                    e: {
+                        price: /*[[${(seat.seatPrice.size() < 5)} ? 0 : ${seat.seatPrice.get(4)[0]}]]*/,
+                        classes: 'e-class',
+                        name: /*[[${(seat.seatPrice.size() < 5)} ? '' : ${seat.seatPrice.get(4)[1]}]]*/
+                    }
                 },
-                b: {
-                    price: 200,
-                    classes: 'b-class'
+                click: function () {
+                    if (this.status() == 'available') {
+                        //do some stuff, i.e. add to the cart
+                        if (selected >= 6) {
+                            alert("最多只能选择6个座位");
+                            return 'available';
+                        } else {
+                            selected++;
+                        }
+                        $total.text(recalculateTotal(sc) + this.data().price)
+                        return 'selected';
+                    } else if (this.status() == 'selected') {
+                        //seat has been vacated
+                        if (selected > 0) {
+                            selected--;
+                        }
+                        $total.text(recalculateTotal(sc) - this.data().price);
+                        return 'available';
+                    } else if (this.status() == 'unavailable') {
+                        //seat has been already booke
+                        return 'unavailable';
+                    } else {
+                        return this.style();
+                    }
                 },
-                c: {
-                    price: 300,
-                    classes: 'c-class'
-                },
-                d: {
-                    price: 300,
-                    classes: 'd-class'
-                }
-            },
-            click: function () {
-                if (this.status() == 'available') {
-                    //do some stuff, i.e. add to the cart
-                    return 'selected';
-                } else if (this.status() == 'selected') {
-                    //seat has been vacated
-                    return 'available';
-                } else if (this.status() == 'unavailable') {
-                    //seat has been already booked
-                    return 'unavailable';
-                } else {
-                    return this.style();
-                }
-            },
 //            naming: {
 //                top: false,
 //                left: false
 //            },
-            legend: {
-                node: $('#legend'),
-                items: /*[[${seat.seatLegend}]]*/
-            }
+                legend: {
+                    node: $('#legend'),
+                    items: /*[[${seat.seatLegend}]]*/
+                }
 
-        });
+            });
 
         sc.get(/*[[${seat.seatUnavailable}]]*/).status('unavailable');
     });
+
+    function recalculateTotal(sc) {
+        var total = 0;
+
+        //basically find every selected seat and sum its price
+        sc.find('selected').each(function () {
+            total += this.data().price;
+        });
+
+        return total;
+    }
+
     /*]]>*/
 </script>
 </html>

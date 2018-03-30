@@ -71,6 +71,9 @@ public interface UserDao {
     )
     User findUserByID(@Param("id") Long id);
 
+    @Select("SELECT rest_points FROM user WHERE id = #{id}")
+    int getRestPoints(@Param("id") Long id);
+
     @Update("UPDATE user SET real_name = #{realName}, username = #{username} WHERE email = #{email} AND token = #{token}")
     int updateInfo(User user);
 }

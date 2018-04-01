@@ -91,7 +91,7 @@ div.seatCharts-container {
 div.seatCharts-legend {
     padding-left: 0px;
     position: absolute;
-    bottom: 16px;
+    /*bottom: 16px;*/
 }
 ul.seatCharts-legendList {
     padding-left: 0px;

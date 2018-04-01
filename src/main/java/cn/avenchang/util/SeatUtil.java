@@ -65,7 +65,8 @@ public class SeatUtil {
                 });
                 liveSeatMap.getSeatPrice().add(new Object[]{
                         planPrice.getPrice(),
-                        planPrice.getName()
+                        planPrice.getName(),
+                        planPrice.getArea()
                 });
                 priceLevel.add(planPrice.getPrice());
             }

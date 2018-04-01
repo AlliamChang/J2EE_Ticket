@@ -3,6 +3,7 @@ package cn.avenchang.service;
 import cn.avenchang.domain.Orders;
 import cn.avenchang.domain.SeatState;
 import cn.avenchang.domain.User;
+import cn.avenchang.model.OrderInfo;
 import cn.avenchang.model.ResultMessage;
 import cn.avenchang.model.UserInfo;
 import org.apache.ibatis.annotations.Select;
@@ -18,7 +19,9 @@ public interface UserManageService {
 
     ResultMessage<UserInfo> getInfo(Long id);
 
-    List<Orders> myOrders(Long id);
+    List<OrderInfo> myOrders(Long id);
+
+    ResultMessage<OrderInfo> unpaidOrder(Long orderId);
 
     /**
      * 返回order id
@@ -38,6 +41,6 @@ public interface UserManageService {
 
     boolean isEnoughToProfit(Long id);
 
-    ResultMessage<Boolean> userProfits(Long orderId);
+    ResultMessage<String> paid(Long orderId, Long accountId, boolean useProfit);
 
 }

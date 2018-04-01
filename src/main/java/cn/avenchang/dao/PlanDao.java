@@ -30,6 +30,9 @@ public interface PlanDao {
     })
     PlanInfo getPlanById(@Param("id") Long id);
 
+    @Select("SELECT venue_id FROM plan WHERE id = #{id}")
+    Long getVenueId(@Param("id") Long id);
+
     @Select("SELECT * FROM plan WHERE time > now()")
     @Results({
             @Result(id = true, column = "id", property = "id"),

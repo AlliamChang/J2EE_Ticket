@@ -10,18 +10,18 @@ public class Test {
 
     public static void main(String[] args){
         MessageFormat mf = new MessageFormat("(#'{'seats[{0}].venueId}, #'{'seats[{0}].area}, #'{'seats[{0}].length}, )");
-//        System.out.println(mf.format());
-        final Test test = new Test();
-        new Thread(
-                () -> {
-                    test.test();
-                }, "test1"
-        ).start();
-        new Thread(
-                () -> {
-                    test.test();
-                }, "test2"
-        ).start();
+        System.out.println(new Date().getTime());
+//        final Test test = new Test();
+//        new Thread(
+//                () -> {
+//                    test.test();
+//                }, "test1"
+//        ).start();
+//        new Thread(
+//                () -> {
+//                    test.test();
+//                }, "test2"
+//        ).start();
     }
 
     public void test() {

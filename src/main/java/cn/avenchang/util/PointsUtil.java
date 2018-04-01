@@ -19,7 +19,7 @@ public class PointsUtil {
     public static int getLevel(int points) {
         int level = 0;
         for (Integer i : defaultConfig.getUserLevel()) {
-            if(level < i){
+            if(points < i){
                 break;
             }
             level ++;

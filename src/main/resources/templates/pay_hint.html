@@ -11,13 +11,12 @@
 <body>
 <div class="container">
     <div class="col-md-12 column">
-        <h4 th:text="${result}">
+        <h4 th:text="${msg}">
 
         </h4>
-        <form th:if="${status==1}" role="form" action="/" method="get">
-            <button type="submit">我知道了</button>
+        <form role="form" action="/user/my_order" method="get">
+            <button type="submit">回到商家页面</button>
         </form>
-        <a th:if="${status==2}" href="javascript:history.go(-1)">返回</a>
     </div>
 </div>
 </body>

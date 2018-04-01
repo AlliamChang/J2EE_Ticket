@@ -1,13 +1,11 @@
 package cn.avenchang.service.impl;
 
-import cn.avenchang.dao.OrdersDao;
-import cn.avenchang.dao.SeatDao;
-import cn.avenchang.dao.TicketDao;
-import cn.avenchang.dao.UserDao;
+import cn.avenchang.dao.*;
 import cn.avenchang.domain.Orders;
 import cn.avenchang.domain.SeatState;
 import cn.avenchang.domain.Ticket;
 import cn.avenchang.domain.User;
+import cn.avenchang.model.OrderInfo;
 import cn.avenchang.model.Profit;
 import cn.avenchang.model.ResultMessage;
 import cn.avenchang.model.UserInfo;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Service;
 import cn.avenchang.service.UserManageService;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -36,6 +35,8 @@ public class UserManageServiceImpl implements UserManageService{
     private OrdersDao ordersDao;
     @Autowired
     private TicketDao ticketDao;
+    @Autowired
+    private PlanDao planDao;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -74,32 +75,43 @@ public class UserManageServiceImpl implements UserManageService{
     public synchronized ResultMessage<Long> buyTicketBySelect(List<SeatState> selectedSeat, Orders orders) {
         boolean isAvailable = true;
         //检测座位是否都能选
-        for (SeatState seatState : selectedSeat) {
+        for (int i = 0; i < selectedSeat.size(); i++) {
+            SeatState seatState = selectedSeat.get(i);
+            if (seatState.getRow() == 0) {
+                selectedSeat.remove(i);
+                continue;
+            }
+            seatState.setPlanId(orders.getPlanId());
             if (seatDao.isAvailable(seatState) <= 0) {
                 isAvailable = false;
                 break;
             }
         }
+
         if (isAvailable) {
             //为每个座位创建票根
+            Long venueId = planDao.getVenueId(orders.getPlanId());
+            orders.setVenueId(venueId);
             List<Ticket> tickets = new ArrayList<>();
             Date now = new Date();
             selectedSeat.forEach(seatState -> {
                 Ticket ticket = new Ticket();
                 ticket.setTime(now);
-                ticket.setVenueId(orders.getVenueId());
+                ticket.setVenueId(venueId);
                 ticket.setUserId(orders.getUserId());
                 ticket.setArea(seatState.getArea());
                 ticket.setRow(seatState.getRow());
                 ticket.setCol(seatState.getCol());
                 ticket.setPlanId(orders.getPlanId());
+                ticket.setOnline(true);
                 tickets.add(ticket);
                 seatDao.bookSeat(seatState);
             });
             //完善订单内容
             orders.setTime(now);
 
-            double discount = PointsUtil.getDiscount(userDao.getRestPoints(orders.getUserId()));
+            //得到会员价
+            double discount = PointsUtil.getDiscount(userDao.getTotalPoints(orders.getUserId()));
             orders.setActualPrice(orders.getOriginalPrice() * discount);
             ordersDao.newOrders(orders);
             if (orders.getId() > 0) {
@@ -117,8 +129,27 @@ public class UserManageServiceImpl implements UserManageService{
     }
 
     @Override
-    public List<Orders> myOrders(Long id) {
-        return ordersDao.getOrders(id);
+    public List<OrderInfo> myOrders(Long id) {
+        List<OrderInfo> orderInfo = ordersDao.getOrders(id);
+        Long now = new Date().getTime();
+        for (int i = 0; i < orderInfo.size(); i++) {
+            OrderInfo info = orderInfo.get(i);
+            if (info.getState() == 0 && ( 300 - (now - info.getTime().getTime())/1000) > 1) {
+                orderInfo.get(i).setDistance( 300 - (now - info.getTime().getTime())/1000);
+            }
+        }
+        return orderInfo;
+    }
+
+    @Override
+    public ResultMessage<OrderInfo> unpaidOrder(Long orderId) {
+        OrderInfo orderInfo = ordersDao.getUnpaidOrderDetail(orderId);
+        if (orderInfo != null) {
+            orderInfo.setSeatInfo(ticketDao.getSeatInfo(orderId));
+            return new ResultMessage<OrderInfo>(ResultMessage.OK, orderInfo);
+        }else {
+            return new ResultMessage<OrderInfo>(ResultMessage.FAIL, "该订单已过期");
+        }
     }
 
     @Override
@@ -137,8 +168,18 @@ public class UserManageServiceImpl implements UserManageService{
     }
 
     @Override
-    public ResultMessage<Boolean> userProfits(Long orderId) {
-        return null;
+    public ResultMessage<String> paid(Long orderId, Long accountId, boolean useProfit) {
+        int result = 0;
+        if(useProfit){
+            result = ordersDao.paidByUseProfit(orderId, accountId);
+        }else {
+            result = ordersDao.paid(orderId, accountId);
+        }
+        if (result > 0) {
+            return new ResultMessage<String>(ResultMessage.OK, "", "");
+        }else {
+            return new ResultMessage<String>(ResultMessage.FAIL, "", "支付失败");
+        }
     }
 
     class OrderPayCountdown implements Runnable{

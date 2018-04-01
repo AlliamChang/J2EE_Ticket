@@ -19,7 +19,7 @@ public class SecurityConfig extends WebMvcConfigurerAdapter{
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(tokenVerifyInterceptor())
-                .addPathPatterns("/user/**", "/venue/**", "/manager/**");
+                .addPathPatterns("/user/**", "/venue/**", "/manager/**").excludePathPatterns("/user/paid");
 //                .excludePathPatterns("/", "/register", "/login/");
         super.addInterceptors(registry);
     }

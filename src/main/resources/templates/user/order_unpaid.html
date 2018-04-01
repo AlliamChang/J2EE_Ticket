@@ -1,10 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>EasyTicket</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
 
+            <a href="/" class="btn btn-primary">回到首页</a>
+            <h3 th:text="${orderInfo.planTitle}"></h3>
+            <dl th:each="seatInfo, iterStat: ${orderInfo.seatInfo}" class="dl-horizontal">
+                <dt th:text="|${seatInfo.name} ${seatInfo.row}排 ${seatInfo.col}列:|">
+
+                </dt>
+                <dd th:text="|¥${seatInfo.price}|">
+
+                </dd>
+            </dl>
+            <hr/>
+            <p class="text-right"><strong>原价: </strong><a th:text="${orderInfo.originalPrice}"></a></p>
+            <p class="text-right"><strong>会员价: </strong><a id="price" th:text="${orderInfo.actualPrice}"></a></p>
+            <div class="pull-right">
+            <form role="form" action="/alipay/pay" method="post">
+                <input type="hidden" name="orderId" th:value="${orderInfo.id}">
+                <input type="hidden" name="callback" value="http://localhost:8080/user/paid">
+                <input id="amount" name="amount" th:value="${orderInfo.actualPrice}" type="hidden">
+                <input type="hidden" name="return" value="/user/my_order">
+                <div th:if="${isEnough}" class="checkbox">
+                    <label>
+                        <input type="checkbox" name="useProfit">使用1000积分兑换优惠券，再优惠50元
+                    </label>
+                </div>
+                <p th:if="${!isEnough}" class="text-right help-block">无可兑换优惠券</p>
+                <button type="submit" class="btn btn-primary">支付</button>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var price = /*[[${orderInfo.actualPrice}]]*/
+    $(document).ready(function () {
+        $(":checkbox").change(function () {
+            if($(this).is(":checked")){
+                $("#price").text((price-50.0).toFixed(1));
+                $("#amount").text((price-50.0).toFixed(1));
+            }else {
+                $("#price").text(price.toFixed(1));
+                $("#amount").text(price.toFixed(1));
+            }
+        })
+    })
+    /*]]*/
+</script>
 </html>

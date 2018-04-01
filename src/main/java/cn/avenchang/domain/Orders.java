@@ -1,6 +1,7 @@
 package cn.avenchang.domain;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by 53068 on 2018/3/30 0030.
@@ -17,6 +18,7 @@ public class Orders {
     private int ticketNum;
     private Double originalPrice;
     private Double actualPrice;
+    private List<SeatState> seatStates;
 
     public Long getId() {
         return id;
@@ -96,5 +98,13 @@ public class Orders {
 
     public void setTicketNum(int ticketNum) {
         this.ticketNum = ticketNum;
+    }
+
+    public List<SeatState> getSeatStates() {
+        return seatStates;
+    }
+
+    public void setSeatStates(List<SeatState> seatStates) {
+        this.seatStates = seatStates;
     }
 }

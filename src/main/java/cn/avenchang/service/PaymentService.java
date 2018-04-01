@@ -11,6 +11,6 @@ import cn.avenchang.model.ResultMessage;
  */
 public interface PaymentService {
 
-    ResultMessage<Boolean> pay(Long orderId, Long cardId, String password, Double amount);
+    ResultMessage<Boolean> pay(Long cardId, String password, Double amount);
 
 }

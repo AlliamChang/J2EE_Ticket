@@ -37,9 +37,85 @@
             </ul>
         </div>
         <div class="col-md-10 column">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>
+                        名称
+                    </th>
+                    <th>
+                        开始时间
+                    </th>
+                    <th>
+                        价格
+                    </th>
+                    <th>
+                        状态
+                    </th>
+                    <th>
 
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order, iterStat:${orders}" class="info">
+                    <td th:text="${order.planTitle}">
+
+                    </td>
+                    <td th:text="${#dates.format(order.time, 'yyyy-MM-dd HH:mm')}">
+
+                    </td>
+                    <td th:text="${order.actualPrice}">
+
+                    </td>
+                    <td th:switch="${order.state}">
+                        <span th:id="${order.id}" th:case="0" class="label label-info" th:text="|于${order.distance}秒内完成支付|"></span>
+                        <span th:case="1" class="label label-success">已付款</span>
+                        <span th:case="2" class="label label-default">已退款</span>
+                        <span th:case="3" class="label label-warning">逾期未付</span>
+                    </td>
+                    <td>
+                       <form th:if="${order.state == 1}" method="post" action="/user/my_order" >
+                           <input type="hidden" name="_method" value="put">
+                           <input type="hidden" name="orderId" th:value="${order.id}">
+                           <input type="hidden" name="accountId" th:value="${order.accountId}">
+                           <button type="submit" class="btn btn-success">退款</button>
+                       </form>
+                        <a th:if="${order.state == 0}" th:href="'/user/order_unpaid/'+${order.id}" class="btn btn-primary">付款</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 </body>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var diff = 300;
+    function timer(diff) {
+        window.setInterval(function () {
+            if(diff > 0) {
+                $(".label-info").each(function () {
+                    var rest = $(this).text().replace(/[^0-9]/ig,"");
+                    console.log(diff);
+                    rest --;
+                    if(rest <= 0) {
+                        $(this).text("逾期未付");
+                        $(this).attr("class", "label label-warning");
+                        var id = $(this).attr("id");
+                        $("[href$=" + id + "]").remove();
+                    }else {
+                        $(this).text("于"+rest+"秒内完成支付")
+                    }
+                })
+            }
+            diff --;
+        }, 1000);
+    }
+    $(function () {
+        timer(diff);
+    });
+    /*]]*/
+</script>
 </html>

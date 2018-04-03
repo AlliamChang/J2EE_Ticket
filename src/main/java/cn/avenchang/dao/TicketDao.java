@@ -24,6 +24,9 @@ public interface TicketDao {
             " FROM ticket as t, plan_price as p" +
             " WHERE t.plan_id = p.plan_id AND t.area = p.area AND t.order_id = #{orderId}")
     List<SeatInfo> getSeatInfo(@Param("orderId") Long orderId);
+
+    @Update("UPDATE ticket SET state = 1 WHERE id = #{id} AND state = 0")
+    int checkIn(@Param("id") Long id);
     
     class TicketDaoProvider{
 

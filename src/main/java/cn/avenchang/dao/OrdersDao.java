@@ -36,9 +36,9 @@ public interface OrdersDao {
             " WHERE o.id = #{id} AND o.state = 0 AND o.user_id = u.id ")
     int paidByUseProfit(@Param("id") Long id, @Param("accountId") Long accountId);
 
-    @Update("UPDATE orders as o, plan as p" +
-            " SET o.state = 2 " +
-            " WHERE o.id = #{id} AND o.state = 1 AND o.plan_id = p.id AND p.time > now()")
+    @Update("UPDATE orders as o, plan as p, ticket as t" +
+            " SET o.state = 2, t.state = 2" +
+            " WHERE o.id = #{id} AND o.id = t.order_id AND o.state = 1 AND o.plan_id = p.id AND p.time > now()")
     int refund(@Param("id") Long id);
 
     @Select("SELECT o.id, o.original_price, o.actual_price, p.title" +
@@ -53,7 +53,7 @@ public interface OrdersDao {
     OrderInfo getUnpaidOrderDetail(@Param("id") Long id);
 
     @Select("SELECT o.id, o.venue_id, o.plan_id, o.account_id, " +
-            "   o.time, o.state, o.actual_price, p.title " +
+            "   o.time, o.state, o.actual_price, p.title, p.time as plan_time " +
             " FROM orders as o, plan as p" +
             " WHERE o.user_id = #{userId} AND o.plan_id = p.id" +
             " ORDER BY o.time desc")
@@ -65,7 +65,8 @@ public interface OrdersDao {
             @Result(column = "time", property = "time"),
             @Result(column = "state", property = "state"),
             @Result(column = "actual_price", property = "actualPrice"),
-            @Result(column = "title", property = "planTitle")
+            @Result(column = "title", property = "planTitle"),
+            @Result(column = "plan_time", property = "planTime")
     })
     List<OrderInfo> getOrders(@Param("userId") Long userId);
 }

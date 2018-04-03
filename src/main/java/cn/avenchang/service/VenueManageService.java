@@ -1,8 +1,13 @@
 package cn.avenchang.service;
 
+import cn.avenchang.domain.Orders;
 import cn.avenchang.domain.Plan;
+import cn.avenchang.domain.SeatState;
 import cn.avenchang.domain.Venue;
 import cn.avenchang.model.ResultMessage;
+import cn.avenchang.model.UserDiscount;
+
+import java.util.List;
 
 /**
  * Created by 53068 on 2018/3/14 0014.
@@ -19,6 +24,8 @@ public interface VenueManageService {
 
     String getVenueName(Long id);
 
-    void buyTicketOffline();
+    ResultMessage<String> buyTicketOffline(List<SeatState> selectedSeat, Long userId);
+
+    ResultMessage<UserDiscount> getUserDiscount(String email);
 
 }

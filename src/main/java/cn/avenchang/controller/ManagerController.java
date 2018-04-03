@@ -1,5 +1,6 @@
 package cn.avenchang.controller;
 
+import cn.avenchang.config.Constant;
 import cn.avenchang.model.ResultMessage;
 import cn.avenchang.service.ManagerService;
 import cn.avenchang.service.SeatService;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -89,6 +91,33 @@ public class ManagerController {
         ModelAndView view = new ModelAndView("/seat_preview");
         final List<String> map = SeatUtil.getSeatMap(seatService.getSeatMap(venueId));
         view.addObject("seatMap", map);
+        return view;
+    }
+
+    @RequestMapping(value = "/settle", method = RequestMethod.GET)
+    public ModelAndView settleList(){
+        ModelAndView view = new ModelAndView("/manager/settle_list");
+        view.addObject("earnings", managerService.getUnsettle());
+        return view;
+    }
+
+    @RequestMapping(value = "/settle", method = RequestMethod.PUT)
+    public ModelAndView settleEarning(RedirectAttributes redirectAttributes,
+                                      @RequestParam("venueId") Long venueId){
+        ModelAndView view = new ModelAndView("redirect:/manager/settle");
+        ResultMessage<String> resultMessage = managerService.settleEarning(venueId);
+        if (resultMessage.status == ResultMessage.OK) {
+            redirectAttributes.addFlashAttribute("status", resultMessage.status);
+        }else {
+            redirectAttributes.addFlashAttribute("msg", resultMessage.message);
+        }
+        return view;
+    }
+
+    @RequestMapping(value = "web_statistic", method = RequestMethod.GET)
+    public ModelAndView webStatistic() {
+        ModelAndView view = new ModelAndView("/manager/web_statistic");
+
         return view;
     }
 }

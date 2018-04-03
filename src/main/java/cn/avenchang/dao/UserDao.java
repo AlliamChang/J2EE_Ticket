@@ -79,4 +79,12 @@ public interface UserDao {
 
     @Update("UPDATE user SET real_name = #{realName}, username = #{username} WHERE email = #{email} AND token = #{token}")
     int updateInfo(User user);
+
+    @Select("SELECT id, username, total_points FROM user WHERE email = #{email}")
+    @Results({
+            @Result(id = true, column = "id", property = "id"),
+            @Result(column = "username", property = "username"),
+            @Result(column = "total_points", property = "totalPoints")
+    })
+    User getTotalPointsByEmail(@Param("email") String email);
 }

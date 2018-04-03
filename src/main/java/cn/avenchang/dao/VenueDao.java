@@ -98,4 +98,7 @@ public interface VenueDao {
 
     @Select("SELECT name FROM venue WHERE id = #{id}")
     String getVenueName(@Param("id") Long id);
+
+    @Update("UPDATE venue SET account = account + #{income} WHERE id = #{id}")
+    int incomeThroughManagerSettling(@Param("id") Long id, @Param("income") Double income);
 }

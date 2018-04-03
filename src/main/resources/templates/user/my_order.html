@@ -37,6 +37,14 @@
             </ul>
         </div>
         <div class="col-md-10 column">
+            <div th:if="${msg != null && msg != ''}" class="alert alert-danger alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <strong>退款失败!</strong><span th:text="${msg}"></span>
+            </div>
+            <div th:if="${status == 1}" class="alert alert-success alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <strong>退款成功!</strong>
+            </div>
             <table class="table">
                 <thead>
                 <tr>
@@ -62,7 +70,7 @@
                     <td th:text="${order.planTitle}">
 
                     </td>
-                    <td th:text="${#dates.format(order.time, 'yyyy-MM-dd HH:mm')}">
+                    <td th:text="${#dates.format(order.planTime, 'yyyy-MM-dd HH:mm')}">
 
                     </td>
                     <td th:text="${order.actualPrice}">

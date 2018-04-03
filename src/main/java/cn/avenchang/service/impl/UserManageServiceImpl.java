@@ -37,6 +37,8 @@ public class UserManageServiceImpl implements UserManageService{
     private TicketDao ticketDao;
     @Autowired
     private PlanDao planDao;
+    @Autowired
+    private EarningDao earningDao;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -136,6 +138,8 @@ public class UserManageServiceImpl implements UserManageService{
             OrderInfo info = orderInfo.get(i);
             if (info.getState() == 0 && ( 300 - (now - info.getTime().getTime())/1000) > 1) {
                 orderInfo.get(i).setDistance( 300 - (now - info.getTime().getTime())/1000);
+            } else if (info.getState() == 1) {
+                
             }
         }
         return orderInfo;
@@ -176,6 +180,7 @@ public class UserManageServiceImpl implements UserManageService{
             result = ordersDao.paid(orderId, accountId);
         }
         if (result > 0) {
+            earningDao.income(orderId);
             return new ResultMessage<String>(ResultMessage.OK, "", "");
         }else {
             return new ResultMessage<String>(ResultMessage.FAIL, "", "支付失败");

@@ -4,6 +4,7 @@ import cn.avenchang.config.Constant;
 import cn.avenchang.domain.Plan;
 import cn.avenchang.domain.Venue;
 import cn.avenchang.model.ResultMessage;
+import cn.avenchang.model.UserDiscount;
 import cn.avenchang.service.PlanService;
 import cn.avenchang.service.SeatService;
 import cn.avenchang.service.VenueManageService;
@@ -22,7 +23,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,6 +59,29 @@ public class VenueController {
         return view;
     }
 
+    @RequestMapping(value = "/choose_seat/{planId}", method = RequestMethod.GET)
+    public ModelAndView chooseSeatPage(@PathVariable Long planId) {
+        ModelAndView view = new ModelAndView("/venue/choose_seat");
+        view.addObject("seat", seatService.getLiveSeatMap(planId));
+        view.addObject("planId", planId);
+        return view;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/discount", method = RequestMethod.GET)
+    public Map getUserDiscount(@RequestParam("email") String email) {
+        ResultMessage<UserDiscount> resultMessage = venueManageService.getUserDiscount(email);
+        Map result = new HashMap();
+        if (resultMessage.status == ResultMessage.OK) {
+            result.put("discount", resultMessage.result.getUserDiscount());
+            result.put("userId", resultMessage.result.getUserId());
+            result.put("username", resultMessage.result.getUsername());
+        } else {
+            result.put("msg", resultMessage.message);
+        }
+        return result;
+    }
+
     @RequestMapping(value = "/my_plan", method = RequestMethod.POST)
     public ModelAndView newPlan(HttpSession session,
                                 RedirectAttributes redirectAttributes,
@@ -86,7 +112,7 @@ public class VenueController {
     }
 
     @RequestMapping(value = "/venue_info", method = RequestMethod.GET)
-    public ModelAndView getInfo(HttpSession session){
+    public ModelAndView getInfo(HttpSession session) {
         ModelAndView view = new ModelAndView("/venue/venue_info");
         Long id = (Long) session.getAttribute(Constant.ID_ATTR);
         ResultMessage<Venue> result = venueManageService.getInfo(id);
@@ -103,7 +129,7 @@ public class VenueController {
     public ResultMessage<Boolean> saveInfo(HttpSession session,
                                            @RequestParam("id") final Long id,
                                            @RequestParam("name") String name,
-                                           @RequestParam("location") String location){
+                                           @RequestParam("location") String location) {
         logger.log(Level.INFO, name.toString());
         final Venue venue = new Venue();
         venue.setId(id);
@@ -124,8 +150,15 @@ public class VenueController {
     }
 
     @RequestMapping(value = "/check_in", method = RequestMethod.PUT)
-    public ModelAndView checkIn(@RequestParam("ticketId") Long ticketId) {
-        ModelAndView view = new ModelAndView("/venue/check_in");
+    public ModelAndView checkIn(@RequestParam("ticketId") Long ticketId,
+                                RedirectAttributes redirectAttributes) {
+        ModelAndView view = new ModelAndView("redirect:/venue/check_in");
+        ResultMessage<Boolean> resultMessage = venueManageService.checkIn(ticketId);
+        if (resultMessage.status == ResultMessage.OK) {
+            redirectAttributes.addFlashAttribute("status", resultMessage.status);
+        } else {
+            redirectAttributes.addFlashAttribute("msg", resultMessage.message);
+        }
         return view;
     }
 }

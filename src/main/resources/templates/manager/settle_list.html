@@ -1,10 +1,84 @@
 <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>EasyTicket</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-10 column">
+            <h3 class="text-left">
+                EasyTicket
+            </h3>
+        </div>
+        <div class="col-md-2 column" style="margin-top: 10px">
+            <form action="/login/logout" method="post">
+                <button type="submit" class="btn btn-default">Logout</button>
+            </form>
+        </div>
+    </div>
+    <div class="row clearfix">
+        <div class="col-md-2 column">
+            <ul class="nav nav-stacked nav-pills">
+                <li>
+                    <a href="/manager">场馆审批</a>
+                </li>
+                <li class="active">
+                    <a href="/manager/settle">场馆结算</a>
+                </li>
+                <li>
+                    <a href="/manager/web_statistic">网站统计</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-10 column">
+            <div th:if="${msg != null && msg != ''}" class="alert alert-danger alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <strong>结算失败!</strong><span th:text="${msg}"></span>
+            </div>
+            <div th:if="${status == 1}" class="alert alert-success alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <strong>结算成功!</strong>
+            </div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>
+                        场馆名称
+                    </th>
+                    <th>
+                        盈利
+                    </th>
+                    <th>
 
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="earning, iterStat: ${earnings}" class="success">
+                    <td th:text="${earning.venueName}">
+
+                    </td>
+                    <td th:text="${earning.earning}">
+
+                    </td>
+                    <td>
+                        <form role="form" action="/manager/settle" method="post">
+                            <input type="hidden" name="_method" value="put">
+                            <input type="hidden" name="venueId" th:value="${earning.venueId}">
+                            <button type="submit" class="btn btn-primary">结算</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 </body>
 </html>

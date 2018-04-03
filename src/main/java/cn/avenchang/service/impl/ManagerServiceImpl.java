@@ -1,14 +1,19 @@
 package cn.avenchang.service.impl;
 
+import cn.avenchang.config.DefaultConfig;
+import cn.avenchang.dao.EarningDao;
 import cn.avenchang.dao.VenueDao;
 import cn.avenchang.domain.Venue;
 import cn.avenchang.model.ResultMessage;
+import cn.avenchang.model.VenueEarning;
 import cn.avenchang.model.VenueUpdate;
 import cn.avenchang.service.EmailService;
 import cn.avenchang.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,7 +25,11 @@ public class ManagerServiceImpl implements ManagerService {
     @Autowired
     private VenueDao venueDao;
     @Autowired
+    private EarningDao earningDao;
+    @Autowired
     private EmailService emailService;
+    @Autowired
+    private DefaultConfig config;
 
     @Override
     public ResultMessage<Boolean> approveRegister(final Long venueId) {
@@ -93,8 +102,27 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public void settle() {
+    public List<VenueEarning> getUnsettle() {
+        List<VenueEarning> earnings = earningDao.getUnsettleEarning();
+        System.out.println(earnings.size());
+        return earnings;
+    }
 
+    @Override
+    public ResultMessage<String> settleEarning(Long venueId) {
+//        String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        Date now = new Date();
+
+        Double venueEarning = earningDao.getVenueEarning(venueId, now);
+        if(earningDao.settle(venueId, now) > 0) {
+            //扣除手续费
+            venueDao.incomeThroughManagerSettling(venueId, venueEarning * (1 - config.getWebProfit()));
+            //网站收取手续费
+            earningDao.webIncome(venueEarning * config.getWebProfit());
+            return new ResultMessage<String>(ResultMessage.OK, "结算成功", "");
+        }else{
+            return new ResultMessage<String>(ResultMessage.FAIL, "", "场馆无需结算或错误的场馆ID");
+        }
     }
 
     @Override

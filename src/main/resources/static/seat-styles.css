@@ -14,7 +14,7 @@ a {
     width: 100%;
     text-align: center;
 }
-.container {
+.my-container {
     margin: 0 auto;
     min-width: 800px;
     text-align: left;

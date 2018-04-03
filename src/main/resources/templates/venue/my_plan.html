@@ -60,7 +60,7 @@
                             <p><span th:text="${plan.type}" class="label label-info">类型</span></p>
                             <p>时间: <span  th:text="${#dates.format(plan.time, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
                             <p>
-                                <a class="btn btn-primary" th:href="@{/venue/offline_ticket/{planId}(planId=${plan.id})}">线下买票</a>
+                                <a class="btn btn-primary" th:href="@{/venue/choose_seat/{planId}(planId=${plan.id})}">线下买票</a>
                             </p>
                         </div>
                     </div>

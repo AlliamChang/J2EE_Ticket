@@ -1,15 +1,15 @@
 package cn.avenchang.service.impl;
 
-import cn.avenchang.dao.PlanDao;
-import cn.avenchang.dao.SeatDao;
-import cn.avenchang.dao.VenueDao;
-import cn.avenchang.domain.Plan;
-import cn.avenchang.domain.PlanPrice;
-import cn.avenchang.domain.Venue;
+import cn.avenchang.dao.*;
+import cn.avenchang.domain.*;
 import cn.avenchang.model.ResultMessage;
+import cn.avenchang.model.UserDiscount;
 import cn.avenchang.service.VenueManageService;
+import cn.avenchang.util.PointsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Created by 53068 on 2018/3/28 0028.
@@ -23,6 +23,12 @@ public class VenueManageServiceImpl implements VenueManageService {
     private PlanDao planDao;
     @Autowired
     private SeatDao seatDao;
+    @Autowired
+    private TicketDao ticketDao;
+    @Autowired
+    private EarningDao earningDao;
+    @Autowired
+    private UserDao userDao;
 
     @Override
     public ResultMessage<Boolean> updateInfo(Venue venue) {
@@ -58,6 +64,8 @@ public class VenueManageServiceImpl implements VenueManageService {
                     plan.getPlanPrices().size()){
                 //插入座位状态
                 seatDao.insertSeatStates(plan.getId(), seatDao.getSeatByVenueId(plan.getVenueId()));
+                //插入该计划的赚钱记录
+                earningDao.addNewPlanEarning(plan.getId(), plan.getVenueId());
                 return new ResultMessage<Boolean>(ResultMessage.OK, true);
             }else {
                 return new ResultMessage<Boolean>(ResultMessage.FAIL, "发布失败，请重试");
@@ -74,11 +82,29 @@ public class VenueManageServiceImpl implements VenueManageService {
 
     @Override
     public ResultMessage<Boolean> checkIn(Long ticketId) {
+        if(ticketDao.checkIn(ticketId) > 0){
+            return new ResultMessage<Boolean>(ResultMessage.OK, true);
+        }else {
+            return new ResultMessage<Boolean>(ResultMessage.FAIL, "票根无效");
+        }
+    }
+
+    @Override
+    public ResultMessage<String> buyTicketOffline(List<SeatState> selectedSeat, Long userId) {
         return null;
     }
 
     @Override
-    public void buyTicketOffline() {
-
+    public ResultMessage<UserDiscount> getUserDiscount(String email) {
+        User user = userDao.getTotalPointsByEmail(email);
+        if (user != null) {
+            UserDiscount discount = new UserDiscount();
+            discount.setUserId(user.getId());
+            discount.setUsername(user.getUsername());
+            discount.setUserDiscount(PointsUtil.getDiscount(user.getTotalPoints()));
+            return new ResultMessage<UserDiscount>(ResultMessage.OK, discount);
+        }else {
+            return new ResultMessage<UserDiscount>(ResultMessage.FAIL, "该会员不存在");
+        }
     }
 }

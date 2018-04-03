@@ -1,10 +1,220 @@
 <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <title>EasyTicket</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/jquery.seat-charts.css" rel="stylesheet">
+    <link href="/seat-styles.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="/jquery.seat-charts.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
+<div class="wrapper">
+    <div class="my-container">
+        <!--<div class="row clearfix">-->
+        <!--<div class="col-md-12 column">-->
+        <a href="/venue/my_plan" class="checkout-button"><< 返回计划</a>
+        <div id="seat-map">
+            <div class="front-indicator">Front</div>
 
+
+        </div>
+        <div class="booking-details">
+            <form>
+                <span id="tag">会员购买</span>
+                <input type="email" id="email" required>
+                <button class="btn btn-default" type="button" onclick="searchUser()">查找</button>
+            </form>
+            <span id="username"></span>
+            <h3>已选座位 (<span id="counter">0</span>):</h3>
+            <form role="form" action="/user/my_order" method="post">
+                <input type="hidden" name="planId" th:value="${planId}">
+                <input type="hidden" name="userId" value="0">
+                <ul id="selected-seats"></ul>
+                总价: <b>¥<span id="total">0</span></b>
+                <input id="total-form" type="hidden" name="originalPrice" value="0">
+                <button id="check-out" type="button" onclick="noSelectedSeat()" class="btn btn-primary">购买</button>
+                <div id="legend"></div>
+            </form>
+        </div>
+        <!--</div>-->
+        <!--</div>-->
+    </div>
+</div>
 </body>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var selected = 0;
+    var discount = 1.0;
+    var flag = 0;
+    var length = /*[[${seat.seatMap[0].length()}]]*/;
+    var frontWidth = (length + 1) * 25;
+    $(document).ready(function () {
+        $(".front-indicator").css("width", frontWidth + 'px');
+
+        var $cart = $('#selected-seats'),
+            $counter = $('#counter');
+        var $total = $('#total'),
+            $totalForm = $('#total-form'),
+            sc = $('#seat-map').seatCharts({
+                map: /*[[${seat.seatMap}]]*/,
+                seats: {
+                    a: {
+                        price: /*[[${(seat.seatPrice.size() < 1)} ? 0 : ${seat.seatPrice.get(0)[0]}]]*/,
+                        classes: 'a-class',
+                        name: /*[[${(seat.seatPrice.size() < 1)} ? '' : ${seat.seatPrice.get(0)[1]}]]*/,
+                        area: /*[[${(seat.seatPrice.size() < 1)} ? '' : ${seat.seatPrice.get(0)[2]}]]*/
+                    },
+                    b: {
+                        price: /*[[${(seat.seatPrice.size() < 2)} ? 0 : ${seat.seatPrice.get(1)[0]}]]*/,
+                        classes: 'b-class',
+                        name: /*[[${(seat.seatPrice.size() < 2)} ? '' : ${seat.seatPrice.get(1)[1]}]]*/,
+                        area: /*[[${(seat.seatPrice.size() < 2)} ? '' : ${seat.seatPrice.get(1)[2]}]]*/
+                    },
+                    c: {
+                        price: /*[[${(seat.seatPrice.size() < 3)} ? 0 : ${seat.seatPrice.get(2)[0]}]]*/,
+                        classes: 'c-class',
+                        name: /*[[${(seat.seatPrice.size() < 3)} ? '' : ${seat.seatPrice.get(2)[1]}]]*/,
+                        area: /*[[${(seat.seatPrice.size() < 3)} ? '' : ${seat.seatPrice.get(2)[2]}]]*/
+                    },
+                    d: {
+                        price: /*[[${(seat.seatPrice.size() < 4)} ? 0 : ${seat.seatPrice.get(3)[0]}]]*/,
+                        classes: 'd-class',
+                        name: /*[[${(seat.seatPrice.size() < 4)} ? '' : ${seat.seatPrice.get(3)[1]}]]*/,
+                        area: /*[[${(seat.seatPrice.size() < 4)} ? '' : ${seat.seatPrice.get(3)[2]}]]*/
+                    },
+                    e: {
+                        price: /*[[${(seat.seatPrice.size() < 5)} ? 0 : ${seat.seatPrice.get(4)[0]}]]*/,
+                        classes: 'e-class',
+                        name: /*[[${(seat.seatPrice.size() < 5)} ? '' : ${seat.seatPrice.get(4)[1]}]]*/,
+                        area: /*[[${(seat.seatPrice.size() < 5)} ? '' : ${seat.seatPrice.get(4)[2]}]]*/
+                    }
+                },
+                click: function () {
+                    if (this.status() == 'available') {
+                        //do some stuff, i.e. add to the cart
+                        if (selected >= 6) {
+                            alert("最多只能选择6个座位");
+                            return 'available';
+                        } else {
+                            selected++;
+                        }
+                        $("#check-out").attr("type", "submit");
+                        $("#check-out").removeAttr("onclick");
+
+                        $('<li><input type="hidden" name="seatStates[' + (flag) + '].row" value="' + this.settings.id[0] + '"><input type="hidden" name="seatStates[' + (flag) + '].col" value="' + this.settings.id[2] + '"><input type="hidden" name="seatStates[' + (flag) + '].area" value="' + this.data().area + '">' + this.data().name + ' # ' + this.settings.id + ': <b>¥' + this.data().price + '</b> <a href="" class="cancel-cart-item">[cancel]</a></li>')
+                            .attr('id', 'cart-item-' + this.settings.id)
+                            .data('seatId', this.settings.id)
+                            .appendTo($cart);
+                        flag++;
+
+                        $counter.text(sc.find('selected').length + 1);
+                        $total.text((recalculateTotal(sc) + this.data().price * discount).toFixed(2));
+                        $totalForm.attr("value", recalculateTotal(sc) + this.data().price * discount);
+                        return 'selected';
+                    } else if (this.status() == 'selected') {
+                        //seat has been vacated
+                        if (selected > 0) {
+                            selected--;
+                        } else {
+                            return;
+                        }
+                        if (selected == 0) {
+                            $("#check-out").attr({
+                                "type": "button",
+                                "onclick": "noSelectedSeat()"
+                            })
+                        }
+
+                        //update the counter
+                        $counter.text(sc.find('selected').length - 1);
+                        //remove the item from our cart
+                        $('#cart-item-' + this.settings.id).remove();
+
+                        $total.text((recalculateTotal(sc) - this.data().price * discount).toFixed(2));
+                        $totalForm.attr("value", recalculateTotal(sc) - this.data().price * discount);
+                        return 'available';
+                    } else if (this.status() == 'unavailable') {
+                        //seat has been already booke
+                        return 'unavailable';
+                    } else {
+                        return this.style();
+                    }
+                },
+//            naming: {
+//                top: false,
+//                left: false
+//            },
+                legend: {
+                    node: $('#legend'),
+                    items: /*[[${seat.seatLegend}]]*/
+                }
+
+            });
+
+        $('#selected-seats').on('click', '.cancel-cart-item', function () {
+            //let's just trigger Click event on the appropriate seat, so we don't have to repeat the logic here
+            sc.get($(this).parents('li:first').data('seatId')).click();
+        });
+
+        sc.get(/*[[${seat.seatUnavailable}]]*/).status('unavailable');
+    });
+
+    function noSelectedSeat() {
+        alert("请先选择座位");
+    }
+
+    function recalculateTotal(sc) {
+        var total = 0;
+
+        //basically find every selected seat and sum its price
+        sc.find('selected').each(function () {
+            total += this.data().price;
+        });
+        if(discount < 1) {
+            total = total * discount;
+            console.log(discount);
+        }
+        return total;
+    }
+
+    function searchUser() {
+        var email = $("#email").val();
+        $.get("/venue/discount", {
+            email: email
+        }, function (data, status) {
+            if (status == 'success') {
+                console.log(data);
+                if(data.userId > 0){
+                    discount = parseFloat(data.discount);
+                    var now = parseFloat($("#total").text());
+                    $("#total").text((now * discount).toFixed(2));
+                    $("#userId").val(data.userId);
+                    $("#username").text('会员名: '+data.username);
+                }else{
+                    var hint = ' <div class="alert alert-danger alert-dismissable">' +
+                        '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>' +
+                        '<strong>请重试！</strong><span>' + data.msg + '</span>' +
+                        '</div>';
+                    $("#tag").before(hint);
+                }
+            } else {
+                var hint = ' <div class="alert alert-danger alert-dismissable">' +
+                    '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>' +
+                    '<strong>请重试！</strong><span>网络不稳定</span>' +
+                    '</div>';
+                $("tag").before(hint);
+            }
+        });
+    }
+
+    /*]]>*/
+</script>
 </html>

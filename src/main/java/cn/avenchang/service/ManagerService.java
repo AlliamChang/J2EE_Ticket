@@ -2,6 +2,7 @@ package cn.avenchang.service;
 
 import cn.avenchang.domain.Venue;
 import cn.avenchang.model.ResultMessage;
+import cn.avenchang.model.VenueEarning;
 import cn.avenchang.model.VenueUpdate;
 
 import java.util.List;
@@ -50,9 +51,15 @@ public interface ManagerService {
     List<VenueUpdate> getToApproveUpdateList();
 
     /**
-     * 
+     * 得到未结算盈利列表
+     * @return
      */
-    void settle();
+    List<VenueEarning> getUnsettle();
+
+    /**
+     * 结算场馆所得
+     */
+    ResultMessage<String> settleEarning(Long venueId);
 
     void charts();
 }

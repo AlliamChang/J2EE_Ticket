@@ -17,6 +17,7 @@ public class OrderInfo {
     private Double originalPrice;
     private Double actualPrice;
     private String planTitle;
+    private Date planTime;
     private Date time;
     private int state;
     private Long distance;
@@ -108,5 +109,13 @@ public class OrderInfo {
 
     public void setDistance(Long distance) {
         this.distance = distance;
+    }
+
+    public Date getPlanTime() {
+        return planTime;
+    }
+
+    public void setPlanTime(Date planTime) {
+        this.planTime = planTime;
     }
 }

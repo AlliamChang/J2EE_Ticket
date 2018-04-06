@@ -10,6 +10,7 @@ import cn.avenchang.model.UserInfo;
 import cn.avenchang.service.PlanService;
 import cn.avenchang.service.SeatService;
 import cn.avenchang.service.UserManageService;
+import cn.avenchang.util.TicketSynchronizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +20,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,8 +51,16 @@ public class UserController {
     @RequestMapping(value = "/plan/{id}", method = RequestMethod.GET)
     public ModelAndView planDetail(@PathVariable Long id) {
         ModelAndView view = new ModelAndView("/user/plan_detail");
-        view.addObject( "plan" ,planService.getPlanDetail(id));
+        view.addObject("plan", planService.getPlanDetail(id));
         view.addObject("id", id);
+        return view;
+    }
+
+    @RequestMapping(value = "/seat_info/{planId}", method = RequestMethod.GET)
+    public ModelAndView getSeatInfo(@PathVariable Long planId,
+                           RedirectAttributes redirectAttributes) {
+        ModelAndView view = new ModelAndView("redirect:/user/plan/"+planId);
+        redirectAttributes.addFlashAttribute("seatInfo", userManageService.getSeatAreaInfo(planId));
         return view;
     }
 
@@ -58,14 +69,19 @@ public class UserController {
                                    RedirectAttributes redirectAttributes,
                                    Orders order) {
         ModelAndView view = new ModelAndView();
-        System.out.println(order.getSeatStates().size());
+//        System.out.println(order.getSeatStates().size());
         Long userId = (Long) session.getAttribute(Constant.ID_ATTR);
         order.setUserId(userId);
-        ResultMessage<Long> resultMessage = userManageService.buyTicketBySelect(order.getSeatStates(), order);
-        if (resultMessage.status == ResultMessage.OK) {
-            view.setViewName("redirect:/user/order_unpaid/"+resultMessage.result);
+        ResultMessage<Long> resultMessage;
+        if (order.getTicketNum() > 0) {
+            resultMessage = userManageService.buyTicketWithoutSelect(order);
         }else {
-            view.setViewName("redirect:/user/plan/"+order.getPlanId());
+            resultMessage = userManageService.buyTicketBySelect(order.getSeatStates(), order);
+        }
+        if (resultMessage.status == ResultMessage.OK) {
+            view.setViewName("redirect:/user/order_unpaid/" + resultMessage.result);
+        } else {
+            view.setViewName("redirect:/user/plan/" + order.getPlanId());
             redirectAttributes.addFlashAttribute("msg", resultMessage.message);
         }
         return view;
@@ -87,16 +103,37 @@ public class UserController {
         return view;
     }
 
+    @RequestMapping(value = "/my_order", method = RequestMethod.DELETE)
+    public ModelAndView refundOrder(@RequestParam("orderId") Long orderId,
+                                    RedirectAttributes redirectAttributes) {
+        ModelAndView view = new ModelAndView("redirect:/user/my_order");
+        ResultMessage<Boolean> resultMessage = userManageService.refundOrder(orderId);
+        if (resultMessage.status == ResultMessage.OK) {
+            redirectAttributes.addFlashAttribute("status", resultMessage.status);
+        } else {
+            redirectAttributes.addFlashAttribute("msg", resultMessage.message);
+        }
+        return view;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/refund_percent", method = RequestMethod.GET)
+    public Map refundPercent(@RequestParam("orderId") Long orderId) {
+        Map result = new HashMap();
+        result.put("percent", userManageService.getRefundPercent(orderId));
+        return result;
+    }
+
     @RequestMapping(value = "/order_unpaid/{orderId}", method = RequestMethod.GET)
     public ModelAndView orderUnpaid(@PathVariable Long orderId,
                                     HttpSession session) {
         ModelAndView view = new ModelAndView("/user/order_unpaid");
         ResultMessage<OrderInfo> resultMessage = userManageService.unpaidOrder(orderId);
-        if(resultMessage.status == ResultMessage.OK){
+        if (resultMessage.status == ResultMessage.OK) {
             Long id = (Long) session.getAttribute(Constant.ID_ATTR);
             view.addObject("isEnough", userManageService.isEnoughToProfit(id));
             view.addObject("orderInfo", resultMessage.result);
-        }else {
+        } else {
             view.setViewName("/user/my_order");
             view.addObject("msg", resultMessage.message);
         }
@@ -106,8 +143,8 @@ public class UserController {
     @ResponseBody
     @RequestMapping(value = "/paid", method = RequestMethod.POST)
     public String pay(@RequestParam("orderId") Long orderId,
-                            @RequestParam("accountId") Long accountId,
-                            @RequestParam("useProfit") boolean useProfit) {
+                      @RequestParam("accountId") Long accountId,
+                      @RequestParam("useProfit") boolean useProfit) {
 
         System.out.println("done");
         userManageService.paid(orderId, accountId, useProfit);
@@ -140,7 +177,7 @@ public class UserController {
         userInfo.setEmail(email);
         userInfo.setUsername(username);
         userInfo.setRealName(realName);
-        return userManageService.updateInfo(userInfo, (String)session.getAttribute(Constant.TOKEN_ATTR));
+        return userManageService.updateInfo(userInfo, (String) session.getAttribute(Constant.TOKEN_ATTR));
     }
 
 }

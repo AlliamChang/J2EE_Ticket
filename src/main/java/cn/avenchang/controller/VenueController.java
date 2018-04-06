@@ -1,6 +1,7 @@
 package cn.avenchang.controller;
 
 import cn.avenchang.config.Constant;
+import cn.avenchang.domain.Orders;
 import cn.avenchang.domain.Plan;
 import cn.avenchang.domain.Venue;
 import cn.avenchang.model.ResultMessage;
@@ -80,6 +81,20 @@ public class VenueController {
             result.put("msg", resultMessage.message);
         }
         return result;
+    }
+
+    @RequestMapping(value = "/sell_ticket", method = RequestMethod.POST)
+    public ModelAndView sellTicket(RedirectAttributes redirectAttributes,
+                                   Orders orders) {
+        ModelAndView view = new ModelAndView("redirect:/venue/my_plan");
+        ResultMessage<String> resultMessage = venueManageService.buyTicketOffline(orders);
+        if (resultMessage.status == ResultMessage.OK) {
+            redirectAttributes.addFlashAttribute("status", resultMessage.status);
+        }else {
+            redirectAttributes.addFlashAttribute("msg", resultMessage.message);
+        }
+        redirectAttributes.addFlashAttribute("action", "sell");
+        return view;
     }
 
     @RequestMapping(value = "/my_plan", method = RequestMethod.POST)

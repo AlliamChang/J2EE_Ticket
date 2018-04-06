@@ -34,9 +34,9 @@
             </form>
             <span id="username"></span>
             <h3>已选座位 (<span id="counter">0</span>):</h3>
-            <form role="form" action="/user/my_order" method="post">
+            <form role="form" action="/venue/sell_ticket" method="post">
                 <input type="hidden" name="planId" th:value="${planId}">
-                <input type="hidden" name="userId" value="0">
+                <input id="userId" type="hidden" name="userId" value="0">
                 <ul id="selected-seats"></ul>
                 总价: <b>¥<span id="total">0</span></b>
                 <input id="total-form" type="hidden" name="originalPrice" value="0">
@@ -117,7 +117,7 @@
 
                         $counter.text(sc.find('selected').length + 1);
                         $total.text((recalculateTotal(sc) + this.data().price * discount).toFixed(2));
-                        $totalForm.attr("value", recalculateTotal(sc) + this.data().price * discount);
+                        $totalForm.attr("value", (recalculateTotal(sc) + this.data().price * discount).toFixed(2));
                         return 'selected';
                     } else if (this.status() == 'selected') {
                         //seat has been vacated
@@ -139,7 +139,7 @@
                         $('#cart-item-' + this.settings.id).remove();
 
                         $total.text((recalculateTotal(sc) - this.data().price * discount).toFixed(2));
-                        $totalForm.attr("value", recalculateTotal(sc) - this.data().price * discount);
+                        $totalForm.attr("value", (recalculateTotal(sc) - this.data().price * discount).toFixed(2));
                         return 'available';
                     } else if (this.status() == 'unavailable') {
                         //seat has been already booke
@@ -192,6 +192,7 @@
         }, function (data, status) {
             if (status == 'success') {
                 console.log(data);
+                console.log(data.userId);
                 if(data.userId > 0){
                     discount = parseFloat(data.discount);
                     var now = parseFloat($("#total").text());

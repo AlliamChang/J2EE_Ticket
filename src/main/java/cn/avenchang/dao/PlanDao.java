@@ -6,6 +6,7 @@ import cn.avenchang.model.PlanInfo;
 import org.apache.ibatis.annotations.*;
 
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +58,9 @@ public interface PlanDao {
     @Select("SELECT * FROM plan_price WHERE plan_id = #{planId}")
     List<PlanPrice> getPlanPrice(@Param("planId") Long id);
 
+    @Select("SELECT * FROM plan_price WHERE plan_id = #{planId} AND area = #{area}")
+    PlanPrice getAreaPrice(@Param("planId") Long id, @Param("area") int area);
+
     @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "id", before = false, resultType = Long.class)
     @Insert("INSERT INTO plan(title, venue_id, venue_name, time, description, type, lowest_price) " +
             "VALUE " +
@@ -65,6 +69,11 @@ public interface PlanDao {
 
     @InsertProvider(type = PlanDaoProvider.class, method = "insertPlanPrice")
     int insertPlanPrice(@Param("id") Long id, @Param("planPrices") List<PlanPrice> planPrices);
+
+    @Select("SELECT p.time" +
+            " FROM plan as p, orders as o" +
+            " WHERE o.id = #{orderId} AND p.id = o.plan_id")
+    Date getPlanTime(@Param("orderId") Long orderId);
 
     class PlanDaoProvider {
 

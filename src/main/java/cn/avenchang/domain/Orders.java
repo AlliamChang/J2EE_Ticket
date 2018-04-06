@@ -16,6 +16,8 @@ public class Orders {
     private Date time;
     private int state;
     private int ticketNum;
+    private int area;
+    private String areaName = "";
     private Double originalPrice;
     private Double actualPrice;
     private List<SeatState> seatStates;
@@ -105,6 +107,23 @@ public class Orders {
     }
 
     public void setSeatStates(List<SeatState> seatStates) {
+
         this.seatStates = seatStates;
+    }
+
+    public int getArea() {
+        return area;
+    }
+
+    public void setArea(int area) {
+        this.area = area;
+    }
+
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
     }
 }

@@ -87,4 +87,7 @@ public interface UserDao {
             @Result(column = "total_points", property = "totalPoints")
     })
     User getTotalPointsByEmail(@Param("email") String email);
+
+    @Update("UPDATE user SET total_points = total_points + #{points} WHERE id = #{userId}")
+    int addPointsByConsumingOffline(@Param("userId") Long userId, @Param("points") int points);
 }

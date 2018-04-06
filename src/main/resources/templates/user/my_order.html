@@ -39,7 +39,7 @@
         <div class="col-md-10 column">
             <div th:if="${msg != null && msg != ''}" class="alert alert-danger alert-dismissable">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <strong>退款失败!</strong><span th:text="${msg}"></span>
+                <strong>退款失败! </strong><span th:text="${msg}"></span>
             </div>
             <div th:if="${status == 1}" class="alert alert-success alert-dismissable">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -56,6 +56,9 @@
                     </th>
                     <th>
                         价格
+                    </th>
+                    <th>
+                        详情
                     </th>
                     <th>
                         状态
@@ -76,6 +79,17 @@
                     <td th:text="${order.actualPrice}">
 
                     </td>
+                    <td th:if="${order.seatInfo != null && order.seatInfo.size() > 0}" th:each="seatInfo, iterStat: ${order.seatInfo}">
+                        <ul>
+                            <li th:text="${seatInfo.name} + '#' + ${seatInfo.row} + '_' + ${seatInfo.col}"></li>
+                        </ul>
+                    </td>
+                    <td th:if="${(order.seatInfo == null || order.seatInfo.size() == 0) && order.state == 0}">
+                        <span class="label label-primary">配票中</span>
+                    </td>
+                    <td th:if="${(order.seatInfo == null || order.seatInfo.size() == 0) && order.state == 3}">
+                        <span class="label label-default">无</span>
+                    </td>
                     <td th:switch="${order.state}">
                         <span th:id="${order.id}" th:case="0" class="label label-info" th:text="|于${order.distance}秒内完成支付|"></span>
                         <span th:case="1" class="label label-success">已付款</span>
@@ -83,17 +97,39 @@
                         <span th:case="3" class="label label-warning">逾期未付</span>
                     </td>
                     <td>
-                       <form th:if="${order.state == 1}" method="post" action="/user/my_order" >
-                           <input type="hidden" name="_method" value="put">
-                           <input type="hidden" name="orderId" th:value="${order.id}">
-                           <input type="hidden" name="accountId" th:value="${order.accountId}">
-                           <button type="submit" class="btn btn-success">退款</button>
-                       </form>
+                        <a th:if="${order.state == 1}" id="refund-btn" th:onclick="'javascript:refundInfo('+${order.id}+')'" href="#refund-info" role="button" class="btn btn-success" data-toggle="modal">退款</a>
                         <a th:if="${order.state == 0}" th:href="'/user/order_unpaid/'+${order.id}" class="btn btn-primary">付款</a>
                     </td>
                 </tr>
                 </tbody>
             </table>
+
+            <div class="modal fade" id="refund-info" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                退款确认
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            内容...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <form id="refund-confirm" method="post" action="/user/my_order" >
+                                <input type="hidden" name="_method" value="delete">
+                                <input id='orderId' type="hidden" name="orderId">
+                                <!--<input type="hidden" name="accountId">-->
+                                <button type="submit" class="btn btn-success">确认退款</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
@@ -111,6 +147,7 @@
                     if(rest <= 0) {
                         $(this).text("逾期未付");
                         $(this).attr("class", "label label-warning");
+                        $(this).parent().prev().children("span").text("无").attr("class", "label label-default");
                         var id = $(this).attr("id");
                         $("[href$=" + id + "]").remove();
                     }else {
@@ -124,6 +161,25 @@
     $(function () {
         timer(diff);
     });
+
+    function refundInfo(orderId) {
+        console.log('click');
+        $.get("/user/refund_percent", {
+            orderId: orderId
+        }, function (data, status) {
+            if(status == 'success'){
+                console.log(data);
+                if(data.percent == 0){
+                    $('#refund-confirm').hide();
+                    $('.modal-body').text("计划开始前的两小时内不能退订");
+                }else {
+                    $('#refund-confirm').show();
+                    $('#orderId').val(orderId);
+                    $('.modal-body').text("退订只会返还你"+parseInt(data.percent*100)+"%的费用");
+                }
+            }
+        })
+    }
     /*]]*/
 </script>
 </html>

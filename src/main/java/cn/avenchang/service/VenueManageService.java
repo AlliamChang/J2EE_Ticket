@@ -24,7 +24,7 @@ public interface VenueManageService {
 
     String getVenueName(Long id);
 
-    ResultMessage<String> buyTicketOffline(List<SeatState> selectedSeat, Long userId);
+    ResultMessage<String> buyTicketOffline(Orders orders);
 
     ResultMessage<UserDiscount> getUserDiscount(String email);
 

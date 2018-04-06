@@ -42,11 +42,13 @@
         <div class="col-md-10 column">
             <div th:if="${msg != null && msg != ''}" class="alert alert-danger alert-dismissable">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <strong>发布失败!</strong><span th:text="${msg}"></span>
+                <strong th:if="${action == null}">发布失败!</strong>
+                <strong th:if="${action != null}">售票失败！</strong><span th:text="${msg}"></span>
             </div>
             <div th:if="${status == 1}" class="alert alert-success alert-dismissable">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <strong>发布成功!</strong>
+                <strong th:if="${action == null}">发布成功!</strong>
+                <strong th:if="${action != null}">售票成功！</strong>
             </div>
             <a href="/venue/new_plan" class="btn btn-default btn-primary">发布计划</a>
             <br>

@@ -31,7 +31,7 @@ public class DefaultConfig {
 
     private static List<Long> refundTime = Arrays.asList(48*60*60*1000L, 12*60*60*1000L, 2*60*60*1000L);
 
-    private static List<Double> refundPercent = Arrays.asList(1.0, 0.8, 0.5);
+    private static List<Double> refundPercent = Arrays.asList(1.0, 0.8, 0.5, 0.0);
 
     private static Double webProfit = 0.1;
 

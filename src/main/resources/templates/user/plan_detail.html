@@ -47,7 +47,7 @@
                 <strong>请重试！</strong><span th:text="${msg}"></span>
             </div>
 
-            <img alt="450x300" width="450px" height="300px" th:src="${plan.poster}" />
+            <img alt="450x300" width="450px" height="300px" th:src="${plan.poster}"/>
             <br>
             <br>
             <dl class="dl-horizontal">
@@ -72,7 +72,7 @@
                 <dt>
                     Venue Location
                 </dt>
-                <dd id="venue_name" th:text="${plan.venueLocation}">
+                <dd id="venue_location" th:text="${plan.venueLocation}">
 
                 </dd>
                 <dt>
@@ -90,13 +90,58 @@
             </dl>
             <div class="btn-group">
                 <a id="btn-choose" th:href="@{/user/choose_seat/{id}(id=${id})}" class="btn btn-primary">选座购票</a>
-                <button id="btn-no-choose" type="button" style="margin-left: 5px;" class="btn btn-info">
+                <a id="btn-no-choose" th:href="@{/user/seat_info/{id}(id=${id})}" style="margin-left: 5px;"
+                   class="btn btn-info">
                     不选座购票
-                </button>
+                </a>
             </div>
+
+            <form th:if="${seatInfo != null}" method="post" action="/user/my_order" id="seat-buy"
+                  role="form">
+                <input type="hidden" name="planId" th:value="${id}">
+                <div class="form-group">
+                    <label for="seat_name">座位</label>
+                    <select name="area" class="form-control" onchange="bindingMaxNum()" id="seat_name">
+                        <option th:each="seatInfo, iterStat: ${seatInfo}" th:id="${iterStat.index}"
+                                th:value="${seatInfo.area}" th:text="|${seatInfo.name}(¥${seatInfo.price})|"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="seat_num">数量</label>
+                    1<input name="ticketNum" step="1" id="seat_num" type="range" min="1" value="1"
+                            th:max="(${seatInfo[0].isOut()}? 20:${seatInfo[0].rest})" class="form-control"
+                            onchange="changeSelectedNum()"/>
+                    <span id="seat_max" th:text="(${seatInfo[0].isOut()}? 20:${seatInfo[0].rest})"></span>
+                    <h3 id="seat_selected">1</h3>
+                </div>
+                <button type="submit" class="btn btn-primary">购买</button>
+            </form>
         </div>
     </div>
 </div>
 
 </body>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var list = /*[[${seatInfo}]]*/;
+    function bindingMaxNum() {
+        var selected = $("#seat_name").val();
+        console.log(selected);
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].area == selected) {
+                var maxSeat = list[i].rest > 20 ? 20 : list[i].rest;
+                $("#seat_num").attr("max", maxSeat).val(1);
+                $("#seat_max").text(maxSeat);
+                $("#seat_selected").text(1);
+                console.log('hit');
+                break;
+            }
+        }
+    }
+
+    function changeSelectedNum() {
+        $("#seat_selected").text($("#seat_num").val());
+    }
+    /*]]*/
+</script>
 </html>

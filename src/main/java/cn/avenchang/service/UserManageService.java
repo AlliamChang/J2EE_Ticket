@@ -5,6 +5,7 @@ import cn.avenchang.domain.SeatState;
 import cn.avenchang.domain.User;
 import cn.avenchang.model.OrderInfo;
 import cn.avenchang.model.ResultMessage;
+import cn.avenchang.model.SeatInfo;
 import cn.avenchang.model.UserInfo;
 import org.apache.ibatis.annotations.Select;
 
@@ -36,6 +37,10 @@ public interface UserManageService {
      * @return
      */
     ResultMessage<Long> buyTicketWithoutSelect(Orders orders);
+
+    List<SeatInfo> getSeatAreaInfo(Long planId);
+
+    Double getRefundPercent(Long orderId);
 
     ResultMessage<Boolean> refundOrder(Long orderId);
 

@@ -48,6 +48,9 @@ CREATE TABLE venue (
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
+ALTER TABLE venue
+  AUTO_INCREMENT = 1000000;
+
 /*待审核的场馆信息*/
 CREATE TABLE venue_to_approve (
   id       INT(7)       NOT NULL,
@@ -136,7 +139,9 @@ CREATE TABLE orders (
   account_id     INT          NOT NULL,
   time           DATETIME     NOT NULL, #下单时间
   state          INT(3)       NOT NULL DEFAULT 0, #订单的状态
+  area_name      VARCHAR(20)  NOT NULL DEFAULT '',
   ticket_num     INT          NOT NULL DEFAULT 0, #如果订单是选座，则为0；如果是不选座，则为购票数
+  area           INT          NOT NULL DEFAULT 0,
   original_price DOUBLE(6, 2) NOT NULL, #原始价格
   actual_price   DOUBLE(6, 2) NOT NULL, #实际价格(会员价)
   PRIMARY KEY (id)

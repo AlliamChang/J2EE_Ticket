@@ -18,6 +18,9 @@ public class OrderInfo {
     private Double actualPrice;
     private String planTitle;
     private Date planTime;
+    private int ticketNum;
+    private int area;
+    private String areaName;
     private Date time;
     private int state;
     private Long distance;
@@ -117,5 +120,29 @@ public class OrderInfo {
 
     public void setPlanTime(Date planTime) {
         this.planTime = planTime;
+    }
+
+    public int getTicketNum() {
+        return ticketNum;
+    }
+
+    public void setTicketNum(int ticketNum) {
+        this.ticketNum = ticketNum;
+    }
+
+    public int getArea() {
+        return area;
+    }
+
+    public void setArea(int area) {
+        this.area = area;
+    }
+
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
     }
 }

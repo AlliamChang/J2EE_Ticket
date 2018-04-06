@@ -5,10 +5,12 @@ package cn.avenchang.model;
  */
 public class SeatInfo {
 
+    private int area;
     private int row;
     private int col;
     private String name;
     private double price;
+    private int rest;
 
     public int getRow() {
         return row;
@@ -40,5 +42,25 @@ public class SeatInfo {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public int getArea() {
+        return area;
+    }
+
+    public void setArea(int area) {
+        this.area = area;
+    }
+
+    public int getRest() {
+        return rest;
+    }
+
+    public void setRest(int rest) {
+        this.rest = rest;
+    }
+
+    public boolean isOut() {
+        return (rest > 20);
     }
 }

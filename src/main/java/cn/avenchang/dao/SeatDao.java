@@ -2,6 +2,7 @@ package cn.avenchang.dao;
 
 import cn.avenchang.domain.Seat;
 import cn.avenchang.domain.SeatState;
+import cn.avenchang.model.SeatInfo;
 import cn.avenchang.util.SeatUtil;
 import org.apache.ibatis.annotations.*;
 
@@ -34,6 +35,9 @@ public interface SeatDao {
             "WHERE plan_id = #{planId} AND row = #{row} AND col = #{col} AND state = 0")
     int bookSeat(SeatState seatState);
 
+    @Select("SELECT * FROM seat_state WHERE plan_id = #{planId} AND state = 1 AND area = #{area} LIMIT #{seatNum}")
+    List<SeatState> getAvailableSeat(@Param("planId") Long planId, @Param("area") int area, @Param("seatNum") int seatNum);
+
     @Select("SELECT * FROM seat_state WHERE plan_id = #{planId} AND state = 1")
     List<SeatState> getUnavailableSeats(@Param("planId") Long planId);
 
@@ -45,6 +49,13 @@ public interface SeatDao {
 
     @Select("SELECT count(*) FROM seat_state WHERE plan_id = #{planId} AND row = #{row} AND col = #{col} AND state = 0")
     int isAvailable(SeatState seatState);
+
+    @Select("SELECT pp.price, pp.area, pp.name, count(*) as rest" +
+            " FROM seat_state as s, plan as p, plan_price as pp" +
+            " WHERE p.id = #{planId} AND p.id = pp.plan_id AND p.id = s.plan_id " +
+            "   AND s.state = 0 AND pp.area = s.area" +
+            " GROUP BY s.area")
+    List<SeatInfo> getAreaSeatInfo(@Param("planId") Long planId);
 
     class SeatDaoProvider {
         public static String insertSeat(Map map) {

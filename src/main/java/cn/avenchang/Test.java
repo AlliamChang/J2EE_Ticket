@@ -2,39 +2,55 @@ package cn.avenchang;
 
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.Scanner;
 
 /**
  * Created by 53068 on 2018/3/25 0025.
  */
 public class Test {
 
-    public static void main(String[] args){
-        MessageFormat mf = new MessageFormat("(#'{'seats[{0}].venueId}, #'{'seats[{0}].area}, #'{'seats[{0}].length}, )");
-        System.out.println(new Date().getTime());
-//        final Test test = new Test();
-//        new Thread(
-//                () -> {
-//                    test.test();
-//                }, "test1"
-//        ).start();
-//        new Thread(
-//                () -> {
-//                    test.test();
-//                }, "test2"
-//        ).start();
+    public static void main(String[] args) {
+        final Test myt2 = new Test();
+        Thread test1 = new Thread(  new Runnable() {  public void run() {  myt2.test1();  }  }, "test1"  );
+        Thread test2 = new Thread(  new Runnable() {  public void run() { myt2.test2();   }  }, "test2"  );
+        test1.start();;
+        test2.start();
     }
 
-    public void test() {
-        int i = 5;
-        while( i-- > 0)
+    public void test1()
+    {
+        synchronized(this)
         {
-            System.out.println(Thread.currentThread().getName() + " : " + i);
-            try
+            int i = 5;
+            while( i-- > 0)
             {
-                Thread.sleep(500);
+                System.out.println(Thread.currentThread().getName() + " : " + i);
+                try
+                {
+                    Thread.sleep(500);
+                }
+                catch (InterruptedException ie)
+                {
+                }
             }
-            catch (InterruptedException ie)
+        }
+    }
+
+    public void test2()
+    {
+        synchronized(this)
+        {
+            int i = 5;
+            while( i-- > 0)
             {
+                System.out.println(Thread.currentThread().getName() + " : " + i);
+                try
+                {
+                    Thread.sleep(500);
+                }
+                catch (InterruptedException ie)
+                {
+                }
             }
         }
     }

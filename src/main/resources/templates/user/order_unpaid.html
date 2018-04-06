@@ -15,7 +15,11 @@
 
             <a href="/" class="btn btn-primary">回到首页</a>
             <h3 th:text="${orderInfo.planTitle}"></h3>
-            <dl th:each="seatInfo, iterStat: ${orderInfo.seatInfo}" class="dl-horizontal">
+            <p th:if="${orderInfo.ticketNum > 0}">
+                <strong th:text="${orderInfo.areaName}"></strong>
+                <span th:text="| ${orderInfo.ticketNum}张|"></span>
+            </p>
+            <dl th:if="${orderInfo.ticketNum == 0}" th:each="seatInfo, iterStat: ${orderInfo.seatInfo}" class="dl-horizontal">
                 <dt th:text="|${seatInfo.name} ${seatInfo.row}排 ${seatInfo.col}列:|">
 
                 </dt>

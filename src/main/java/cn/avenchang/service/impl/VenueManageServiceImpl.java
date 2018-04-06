@@ -6,6 +6,7 @@ import cn.avenchang.model.ResultMessage;
 import cn.avenchang.model.UserDiscount;
 import cn.avenchang.service.VenueManageService;
 import cn.avenchang.util.PointsUtil;
+import cn.avenchang.util.TicketSynchronizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,8 @@ public class VenueManageServiceImpl implements VenueManageService {
     private EarningDao earningDao;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private TicketSynchronizer ticketSynchronizer;
 
     @Override
     public ResultMessage<Boolean> updateInfo(Venue venue) {
@@ -90,8 +93,8 @@ public class VenueManageServiceImpl implements VenueManageService {
     }
 
     @Override
-    public ResultMessage<String> buyTicketOffline(List<SeatState> selectedSeat, Long userId) {
-        return null;
+    public ResultMessage<String> buyTicketOffline(Orders orders) {
+        return ticketSynchronizer.buyTicketOffline(orders);
     }
 
     @Override

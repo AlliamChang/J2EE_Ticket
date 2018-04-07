@@ -37,7 +37,60 @@
             </ul>
         </div>
         <div class="col-md-10 column">
+            <div th:if="${msg != null && msg != ''}" class="alert alert-danger alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <strong>获取失败！</strong><span th:text="${msg}"></span>
+            </div>
+            <dl class="dl-horizontal">
+                <h2>网站统计</h2>
+                <br>
+                <dt>
+                    网站盈利
+                </dt>
+                <dd th:text="|¥${web.income}|">
 
+                </dd>
+            </dl>
+            <hr>
+            <dl class="dl-horizontal">
+                <h2>用户统计</h2>
+                <br>
+                <dt>
+                    用户注册数
+                </dt>
+                <dd th:text="${web.userNum}">
+
+                </dd>
+                <dt>
+                    用户下单量
+                </dt>
+                <dd th:text="${web.orderNum}">
+
+                </dd>
+                <dt>
+                    订单总额
+                </dt>
+                <dd th:text="|¥${web.orderValue}|">
+
+                </dd>
+            </dl>
+            <hr>
+            <dl class="dl-horizontal">
+                <h2>场馆统计</h2>
+                <br>
+                <dt>
+                    场馆数
+                </dt>
+                <dd th:text="${web.venueNum}">
+
+                </dd>
+                <dt>
+                    场馆计划数
+                </dt>
+                <dd th:text="${web.planNum}">
+
+                </dd>
+            </dl>
         </div>
     </div>
 </div>

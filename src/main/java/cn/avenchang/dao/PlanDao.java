@@ -3,6 +3,7 @@ package cn.avenchang.dao;
 import cn.avenchang.domain.Plan;
 import cn.avenchang.domain.PlanPrice;
 import cn.avenchang.model.PlanInfo;
+import cn.avenchang.model.VenueStatistic;
 import org.apache.ibatis.annotations.*;
 
 import java.text.MessageFormat;
@@ -74,6 +75,17 @@ public interface PlanDao {
             " FROM plan as p, orders as o" +
             " WHERE o.id = #{orderId} AND p.id = o.plan_id")
     Date getPlanTime(@Param("orderId") Long orderId);
+
+    @Select("SELECT count(*) FROM plan")
+    int getPlanNum();
+
+    @Select("SELECT p.title, e.earning, " +
+            "   COUNT(CASE WHEN t.state = 1 THEN 1 ELSE NULL END) AS paidNum," +
+            "   COUNT(CASE WHEN t.state = 2 THEN 1 ELSE NULL END) AS refundNum" +
+            " FROM plan as p, ticket as t, earning as e" +
+            " WHERE p.venue_id = #{venueId} AND p.time < now() AND p.id = t.plan_id AND p.id = e.plan_id" +
+            " GROUP BY p.id")
+    List<VenueStatistic> getPlanStatistic(@Param("venueId") Long venueId);
 
     class PlanDaoProvider {
 

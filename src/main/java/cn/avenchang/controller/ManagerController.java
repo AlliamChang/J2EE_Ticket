@@ -2,6 +2,7 @@ package cn.avenchang.controller;
 
 import cn.avenchang.config.Constant;
 import cn.avenchang.model.ResultMessage;
+import cn.avenchang.model.WebStatistic;
 import cn.avenchang.service.ManagerService;
 import cn.avenchang.service.SeatService;
 import cn.avenchang.util.SeatUtil;
@@ -117,7 +118,12 @@ public class ManagerController {
     @RequestMapping(value = "web_statistic", method = RequestMethod.GET)
     public ModelAndView webStatistic() {
         ModelAndView view = new ModelAndView("/manager/web_statistic");
-
+        ResultMessage<WebStatistic> resultMessage = managerService.webStatistic();
+        if (resultMessage.status == ResultMessage.OK) {
+            view.addObject("web", resultMessage.result);
+        }else {
+            view.addObject("msg", resultMessage.message);
+        }
         return view;
     }
 }

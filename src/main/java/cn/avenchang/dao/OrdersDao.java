@@ -81,4 +81,10 @@ public interface OrdersDao {
             @Result(column = "ticket_num", property = "ticketNum")
     })
     List<OrderInfo> getOrders(@Param("userId") Long userId);
+
+    @Select("SELECT COUNT(id) FROM orders")
+    int getOrderNum();
+
+    @Select("SELECT SUM(actual_price) FROM orders WHERE state = 1")
+    Double getOrderValue();
 }

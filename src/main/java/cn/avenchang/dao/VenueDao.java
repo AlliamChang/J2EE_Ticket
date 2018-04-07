@@ -2,6 +2,7 @@ package cn.avenchang.dao;
 
 import cn.avenchang.domain.Manager;
 import cn.avenchang.domain.Venue;
+import cn.avenchang.model.VenueStatistic;
 import cn.avenchang.model.VenueUpdate;
 import org.apache.ibatis.annotations.*;
 
@@ -101,4 +102,10 @@ public interface VenueDao {
 
     @Update("UPDATE venue SET account = account + #{income} WHERE id = #{id}")
     int incomeThroughManagerSettling(@Param("id") Long id, @Param("income") Double income);
+
+    @Select("SELECT COUNT(id) FROM venue WHERE flag = 1")
+    int getVenueNum();
+
+    @Select("SELECT account FROM venue WHERE id = #{id}")
+    Double getVenueEarning(@Param("id") Long id);
 }

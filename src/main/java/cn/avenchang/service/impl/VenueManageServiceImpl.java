@@ -4,6 +4,7 @@ import cn.avenchang.dao.*;
 import cn.avenchang.domain.*;
 import cn.avenchang.model.ResultMessage;
 import cn.avenchang.model.UserDiscount;
+import cn.avenchang.model.VenueStatistic;
 import cn.avenchang.service.VenueManageService;
 import cn.avenchang.util.PointsUtil;
 import cn.avenchang.util.TicketSynchronizer;
@@ -109,5 +110,15 @@ public class VenueManageServiceImpl implements VenueManageService {
         }else {
             return new ResultMessage<UserDiscount>(ResultMessage.FAIL, "该会员不存在");
         }
+    }
+
+    @Override
+    public ResultMessage<Double> getVenueEarning(Long id) {
+        return new ResultMessage<Double>(ResultMessage.OK, venueDao.getVenueEarning(id));
+    }
+
+    @Override
+    public List<VenueStatistic> getVenueStatistic(Long id) {
+        return planDao.getPlanStatistic(id);
     }
 }

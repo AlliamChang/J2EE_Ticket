@@ -1,12 +1,13 @@
 package cn.avenchang.service.impl;
 
 import cn.avenchang.config.DefaultConfig;
-import cn.avenchang.dao.EarningDao;
-import cn.avenchang.dao.VenueDao;
+import cn.avenchang.dao.*;
+import cn.avenchang.domain.Orders;
 import cn.avenchang.domain.Venue;
 import cn.avenchang.model.ResultMessage;
 import cn.avenchang.model.VenueEarning;
 import cn.avenchang.model.VenueUpdate;
+import cn.avenchang.model.WebStatistic;
 import cn.avenchang.service.EmailService;
 import cn.avenchang.service.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,12 @@ public class ManagerServiceImpl implements ManagerService {
     private EmailService emailService;
     @Autowired
     private DefaultConfig config;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private OrdersDao ordersDao;
+    @Autowired
+    private PlanDao planDao;
 
     @Override
     public ResultMessage<Boolean> approveRegister(final Long venueId) {
@@ -126,7 +133,14 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public void charts() {
-
+    public ResultMessage<WebStatistic> webStatistic() {
+        WebStatistic webStatistic = new WebStatistic();
+        webStatistic.setIncome(earningDao.getWebEarning());
+        webStatistic.setUserNum(userDao.getUserNum());
+        webStatistic.setOrderNum(ordersDao.getOrderNum());
+        webStatistic.setOrderValue(ordersDao.getOrderValue());
+        webStatistic.setVenueNum(venueDao.getVenueNum());
+        webStatistic.setPlanNum(planDao.getPlanNum());
+        return new ResultMessage<WebStatistic>(ResultMessage.OK, webStatistic);
     }
 }

@@ -90,4 +90,7 @@ public interface UserDao {
 
     @Update("UPDATE user SET total_points = total_points + #{points} WHERE id = #{userId}")
     int addPointsByConsumingOffline(@Param("userId") Long userId, @Param("points") int points);
+
+    @Select("SELECT count(id) FROM user WHERE flag = 1 OR flag = 2")
+    int getUserNum();
 }

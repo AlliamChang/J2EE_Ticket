@@ -154,8 +154,11 @@ public class VenueController {
     }
 
     @RequestMapping(value = "/venue_statistic", method = RequestMethod.GET)
-    public ModelAndView getVenueStatistic() {
+    public ModelAndView getVenueStatistic(HttpSession session) {
         ModelAndView view = new ModelAndView("/venue/venue_statistic");
+        Long id = (Long) session.getAttribute(Constant.ID_ATTR);
+        view.addObject("income", venueManageService.getVenueEarning(id).result);
+        view.addObject("statistic", venueManageService.getVenueStatistic(id));
         return view;
     }
 

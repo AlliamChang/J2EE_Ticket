@@ -6,6 +6,7 @@ import cn.avenchang.domain.SeatState;
 import cn.avenchang.domain.Venue;
 import cn.avenchang.model.ResultMessage;
 import cn.avenchang.model.UserDiscount;
+import cn.avenchang.model.VenueStatistic;
 
 import java.util.List;
 
@@ -27,5 +28,9 @@ public interface VenueManageService {
     ResultMessage<String> buyTicketOffline(Orders orders);
 
     ResultMessage<UserDiscount> getUserDiscount(String email);
+
+    ResultMessage<Double> getVenueEarning(Long id);
+
+    List<VenueStatistic> getVenueStatistic(Long id);
 
 }

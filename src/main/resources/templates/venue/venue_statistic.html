@@ -40,7 +40,51 @@
             </ul>
         </div>
         <div class="col-md-10 column">
+            <h3>场馆统计</h3>
+            <dl class="dl-horizontal">
+                <dt>
+                    场馆盈利
+                </dt>
+                <dd th:text="|¥${income}|">
 
+                </dd>
+            </dl>
+            <hr>
+            <br>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>
+                        名称
+                    </th>
+                    <th>
+                        预订数
+                    </th>
+                    <th>
+                        退订数
+                    </th>
+                    <th>
+                        网上销售额
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="venue, iterStat: ${statistic}">
+                    <td th:text="${venue.title}">
+
+                    </td>
+                    <td th:text="${venue.paidNum}">
+
+                    </td>
+                    <td th:text="${venue.refundNum}">
+
+                    </td>
+                    <td th:text="|¥${venue.earning}|">
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

@@ -4,6 +4,7 @@ import cn.avenchang.domain.Venue;
 import cn.avenchang.model.ResultMessage;
 import cn.avenchang.model.VenueEarning;
 import cn.avenchang.model.VenueUpdate;
+import cn.avenchang.model.WebStatistic;
 
 import java.util.List;
 
@@ -61,5 +62,5 @@ public interface ManagerService {
      */
     ResultMessage<String> settleEarning(Long venueId);
 
-    void charts();
+    ResultMessage<WebStatistic> webStatistic();
 }

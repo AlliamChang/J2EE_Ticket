@@ -80,10 +80,10 @@ public interface PlanDao {
     int getPlanNum();
 
     @Select("SELECT p.title, e.earning, " +
-            "   COUNT(CASE WHEN t.state = 1 THEN 1 ELSE NULL END) AS paidNum," +
-            "   COUNT(CASE WHEN t.state = 2 THEN 1 ELSE NULL END) AS refundNum" +
-            " FROM plan as p, ticket as t, earning as e" +
-            " WHERE p.venue_id = #{venueId} AND p.time < now() AND p.id = t.plan_id AND p.id = e.plan_id" +
+            "   COUNT(CASE WHEN o.state = 1 THEN 1 ELSE NULL END) AS paidNum," +
+            "   COUNT(CASE WHEN o.state = 2 THEN 1 ELSE NULL END) AS refundNum" +
+            " FROM plan as p, ticket as t, earning as e, orders as o" +
+            " WHERE p.venue_id = #{venueId} AND p.time < now() AND p.id = o.plan_id AND o.id = t.order_id AND p.id = t.plan_id AND p.id = e.plan_id" +
             " GROUP BY p.id")
     List<VenueStatistic> getPlanStatistic(@Param("venueId") Long venueId);
 

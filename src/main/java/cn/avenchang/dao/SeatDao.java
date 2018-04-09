@@ -35,7 +35,7 @@ public interface SeatDao {
             "WHERE plan_id = #{planId} AND row = #{row} AND col = #{col} AND state = 0")
     int bookSeat(SeatState seatState);
 
-    @Select("SELECT * FROM seat_state WHERE plan_id = #{planId} AND state = 1 AND area = #{area} LIMIT #{seatNum}")
+    @Select("SELECT * FROM seat_state WHERE plan_id = #{planId} AND state = 0 AND area = #{area} LIMIT #{seatNum}")
     List<SeatState> getAvailableSeat(@Param("planId") Long planId, @Param("area") int area, @Param("seatNum") int seatNum);
 
     @Select("SELECT * FROM seat_state WHERE plan_id = #{planId} AND state = 1")

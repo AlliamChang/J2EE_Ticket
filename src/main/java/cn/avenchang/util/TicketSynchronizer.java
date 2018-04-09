@@ -6,6 +6,7 @@ import cn.avenchang.domain.PlanPrice;
 import cn.avenchang.domain.SeatState;
 import cn.avenchang.domain.Ticket;
 import cn.avenchang.model.ResultMessage;
+import cn.avenchang.model.SeatInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -171,6 +172,39 @@ public class TicketSynchronizer {
         }
     }
 
+    public ResultMessage<String> allocateTicket(Orders orders) {
+        synchronized (this) {
+            int available = seatDao.getAvailableSeatNumByArea(orders.getPlanId(), orders.getArea());
+            if (orders.getTicketNum() > available) {
+                ordersDao.refund(orders.getId());
+                ordersDao.refundMoney(orders.getId(), 1);
+                return new ResultMessage<String>(ResultMessage.FAIL, "", "余座不足");
+            }else {
+                List<SeatState> selectedSeat = seatDao.getAvailableSeat(orders.getPlanId(), orders.getArea(), orders.getTicketNum());
+                System.out.println(selectedSeat.size());
+                System.out.println(orders.getPlanId() + " " + orders.getArea() + " " + orders.getTicketNum());
+                List<Ticket> tickets = new ArrayList<>();
+                selectedSeat.forEach(seatState -> {
+                    Ticket ticket = new Ticket();
+                    ticket.setTime(orders.getTime());
+                    ticket.setVenueId(orders.getVenueId());
+                    ticket.setUserId(orders.getUserId());
+                    ticket.setArea(seatState.getArea());
+                    ticket.setRow(seatState.getRow());
+                    ticket.setCol(seatState.getCol());
+                    ticket.setPlanId(orders.getPlanId());
+                    ticket.setOnline(false);
+                    tickets.add(ticket);
+                    seatState.setPlanId(orders.getPlanId());
+                    seatDao.bookSeat(seatState);
+                });
+                ticketDao.insertTickets(orders.getId(), tickets);
+                ordersDao.allocateFinish(orders.getId());
+                return new ResultMessage<String>(ResultMessage.OK, "配票完成", "");
+            }
+        }
+    }
+
     class OrderPayCountdown implements Runnable{
 
         private final Long orderId;
@@ -186,7 +220,7 @@ public class TicketSynchronizer {
         public void run() {
             try {
                 // 5分钟内不支付则取消订单
-                Thread.sleep(5 * 60 * 1000);
+                Thread.sleep(1 * 60 * 1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

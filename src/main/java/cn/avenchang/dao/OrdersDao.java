@@ -24,7 +24,7 @@ public interface OrdersDao {
             "    AND o.id = t.order_id AND t.row = s.row AND t.col = s.col")
     int overdue(@Param("id") Long id);
 
-    @Update("UPDATE orders SET state = 3 WHERE id = #{id}")
+    @Update("UPDATE orders SET state = 3 WHERE id = #{id} AND state = 0")
     int overdueWithoutSelect(@Param("id") Long id);
 
     @Update("UPDATE orders as o, user as u" +
@@ -39,9 +39,9 @@ public interface OrdersDao {
             " WHERE o.id = #{id} AND o.state = 0 AND o.user_id = u.id ")
     int paidByUseProfit(@Param("id") Long id, @Param("accountId") Long accountId);
 
-    @Update("UPDATE orders as o, plan as p, ticket as t" +
-            " SET o.state = 2, t.state = 2" +
-            " WHERE o.id = #{id} AND o.id = t.order_id AND o.state = 1 AND o.plan_id = p.id AND p.time > now()")
+    @Update("UPDATE orders as o, plan as p, ticket as t, seat_state as s" +
+            " SET o.state = 2, t.state = 2, s.state = 0" +
+            " WHERE o.id = #{id} AND o.id = t.order_id AND s.plan_id = o.plan_id AND o.state = 1 AND o.plan_id = p.id AND p.time > now()")
     int refund(@Param("id") Long id);
 
     @Update("UPDATE orders as o, account as a" +
@@ -87,4 +87,19 @@ public interface OrdersDao {
 
     @Select("SELECT SUM(actual_price) FROM orders WHERE state = 1")
     Double getOrderValue();
+
+    @Select("SELECT * FROM orders WHERE ticket_num > 0 and state = 1")
+    @Results({
+            @Result(id = true, column = "id", property = "id"),
+            @Result(column = "area", property = "area"),
+            @Result(column = "plan_id", property = "planId"),
+            @Result(column = "venue_id", property = "venueId"),
+            @Result(column = "user_id", property = "userId"),
+            @Result(column = "time", property = "time"),
+            @Result(column = "ticket_num", property = "ticketNum")
+    })
+    List<Orders> getUnselectedOrder();
+
+    @Update("UPDATE orders SET ticket_num = 0 WHERE id = #{id}")
+    int allocateFinish(@Param("id") Long id);
 }

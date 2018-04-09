@@ -5,5 +5,6 @@ package cn.avenchang.state;
  */
 public enum TicketState {
     UNCHECKED,
-    CHECKED
+    CHECKED,
+    OVERDUE
 }

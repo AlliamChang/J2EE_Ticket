@@ -84,7 +84,7 @@
                             <li th:text="${seatInfo.name} + '#' + ${seatInfo.row} + '_' + ${seatInfo.col}"></li>
                         </ul>
                     </td>
-                    <td th:if="${(order.seatInfo == null || order.seatInfo.size() == 0) && order.state == 0}">
+                    <td th:if="${(order.seatInfo == null || order.seatInfo.size() == 0) && order.state == 1}">
                         <span class="label label-primary">配票中</span>
                     </td>
                     <td th:if="${(order.seatInfo == null || order.seatInfo.size() == 0) && order.state == 3}">
